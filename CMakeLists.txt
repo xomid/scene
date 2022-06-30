@@ -7,8 +7,6 @@ endif()
 
 project (scene)
 
-set(SUBSYSTEM WIN32)
-
 if(WIN32)
 	set(GLOBAL_OUT_DIR "C:/Users/Omid/Documents/cmake/out")
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${GLOBAL_OUT_DIR}/bin/${CMAKE_BUILD_TYPE}")
@@ -18,6 +16,8 @@ if(WIN32)
 	include_directories(${PROJECT_NAME} "${GLOBAL_OUT_DIR}/include/ocom")
 	include_directories(${PROJECT_NAME} "${GLOBAL_OUT_DIR}/include/oui")
 endif()
+
+set(SUBSYSTEM WIN32)
 
 find_package(PNG REQUIRED)
 

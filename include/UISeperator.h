@@ -2,10 +2,10 @@
 #include <oui_label.h>
 class UISeperator : public UILabel
 {
-	Color shadowColor;
+	Color lineColor, shadowColor;
 public:
-	void on_init() override;
+	UISeperator();
 	void on_update() override;
-	void set_color(Color color) override;
+	void set_line_colors(Color lineColor, Color shadowColor);
 };
 

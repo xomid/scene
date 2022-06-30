@@ -2,15 +2,16 @@
 
 void UIButtonWithMenu::on_init() {
 	triangle = parse_svg(R"(
-		<svg x="0px" y="0px" viewBox="0 0 284.356 284.356" fill="gray">
+		<svg x="0px" y="0px" viewBox="0 0 284.356 284.356" fill="currentColor">
 			<path d="M0,284.356h284.356V0L0,284.356z"/>
 		</svg>
 	)");
+	triangle->m_colors = &colors;
 	bOn = false;
 }
 
 void UIButtonWithMenu::on_update() {
-	UIButton::on_update();
+	UIButtonWithBorderOnHover::on_update();
 	int l, t, w, h, m;
 	w = 5;
 	h = 5;
@@ -35,6 +36,8 @@ void UIButtonWithMenu::set_menu(UIMenu* menu) {
 }
 
 void UIButtonWithMenu::on_mouse_down(int x, int y, uint32_t flags) {
+	if (!bEnabled) return;
+
 	bOn = menu->bVisible;
 	UIButton::on_mouse_down(x, y, flags);
 	if (bOn) {

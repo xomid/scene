@@ -1,6 +1,7 @@
 #pragma once
-#include "menu_common.h"
-class UIMAdjust : public UIMenu
+#include "UIComMenu.h"
+
+class UIMAdjust : public UIComMenu
 {
 public:
 	void on_init() override;

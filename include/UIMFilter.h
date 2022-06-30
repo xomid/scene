@@ -1,6 +1,7 @@
 #pragma once
-#include "menu_common.h"
-class UIMFilter : public UIMenu
+#include "UIComMenu.h"
+
+class UIMFilter : public UIComMenu
 {
 public:
 	void on_init() override;

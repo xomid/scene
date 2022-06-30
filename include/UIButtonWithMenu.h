@@ -1,5 +1,5 @@
 #pragma once
-#include "menu_common.h"
+#include <oui_menu.h>
 #include "UIButtonWithBorderOnHover.h"
 
 class UIButtonWithMenu : public UIButtonWithBorderOnHover
