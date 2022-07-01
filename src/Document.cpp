@@ -13,7 +13,11 @@ FileManager* Document::get_file_manager() const {
 }
 
 Sheet* Document::get_image() {
-	return &image;
+	return image;
+}
+
+Sheet* Document::get_frame() {
+	return &frame;
 }
 
 std::wstring Document::get_file_path() {
@@ -26,11 +30,11 @@ History* Document::get_history() {
 
 int Document::close(bool bForceClose) {
 	if (!bForceClose && bInvalidated) return 1;
-	image.free();
 	history.clear();
 	filePath = L"";
 	fileType = FileType::OTHER;
 	bInvalidated = false;
+	image = NULL;
 	return 0;
 }
 
@@ -39,7 +43,7 @@ bool Document::is_invalidated() const {
 }
 
 bool Document::is_open() const {
-	return !image.is_useless();
+	return image != NULL && !image->is_useless();
 }
 
 std::wstring Document::get_alternative_file_path() const {
@@ -59,20 +63,28 @@ void Document::invalidate() {
 	bInvalidated = true;
 }
 
-int Document::snap_shot(std::wstring title) {
-	history.push(&image, title);
+Sheet* Document::snap_shot(std::wstring title) {
+	auto newImage = new Sheet();
+	if (newImage == NULL) return NULL;
+	newImage->clone(image);
+	history.push(newImage, title);
 	bInvalidated = true;
-	return 0;
+	image = newImage;
+	return newImage;
 }
 
 int Document::load(std::wstring filePath) {
 	if (close(false)) return 1;
+
+	history.push(new Sheet(), L"Original");
+	if ((image = history.get(0)->image) == NULL) return 1;
 
 	bInvalidated = false;
 	ImageTranscoder transcoder;
 	if (transcoder.load(filePath, image, fileType))
 		return 1;
 
+	frame.clone(image);
 	this->filePath = filePath;
 	std::wstring fileName = L"";
 	auto pos = filePath.find_last_of(L"\\\\");
@@ -80,18 +92,17 @@ int Document::load(std::wstring filePath) {
 		fileName = filePath.substr(pos + 1);
 	}
 	fileMgr->append_recent_file(fileName, filePath);
-	snap_shot(L"Original");
 
 	// dummy history
 	{
-		for (int i = 0; i < image.h * image.pitch; ++i) {
-			image.data[i] = 0xff - image.data[i];
-		}
-		snap_shot(L"Negative");
+		//for (int i = 0; i < image->h * image->pitch; ++i) {
+			//image->data[i] = 0xff - image->data[i];
+		//}
+		//snap_shot(L"Negative");
 
-		/*for (int y = 0; y < image.h; ++y) {
-			for (int x = 0; x < image.w; ++x) {
-				pyte d = image.data + x * 3 + y * image.pitch;
+		/*for (int y = 0; y < image->h; ++y) {
+			for (int x = 0; x < image->w; ++x) {
+				pyte d = image->data + x * 3 + y * image->pitch;
 				byte g = (d[0] + d[1] + d[2]) / 3;
 				d[0] = d[1] = d[2] = g;
 			}
@@ -113,14 +124,14 @@ int Document::save(std::wstring filePath) {
 void Document::undo() {
 	auto chkImage = history.undo();
 	if (!chkImage) return;
-	image.copy(chkImage->image);
+	frame.copy(image = chkImage->image);
 	bInvalidated = true;
 }
 
 void Document::redo() {
 	auto chkImage = history.redo();
 	if (!chkImage) return;
-	image.copy(chkImage->image);
+	frame.copy(image = chkImage->image);
 	bInvalidated = true;
 }
 
@@ -128,6 +139,6 @@ void Document::checkout(size_t historyIndex) {
 	if (historyIndex == history.get_head_index()) return;
 	auto chkImage = history.get(historyIndex);
 	if (!chkImage) return;
-	image.copy(chkImage->image);
+	frame.copy(image = chkImage->image);
 	bInvalidated = true;
 }

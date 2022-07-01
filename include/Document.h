@@ -6,7 +6,7 @@
 
 class Document
 {
-	Sheet image;
+	Sheet *image, frame;
 	History history;
 	FileManager* fileMgr;
 	bool bInvalidated;
@@ -23,12 +23,13 @@ public:
 	void set_file_manager(FileManager* fileMgr);
 	FileManager* get_file_manager() const;
 	Sheet* get_image();
+	Sheet* get_frame();
 	History* get_history();
 
 	int load(std::wstring path);
 	int save(std::wstring path);
 	int close(bool bForceClose);
-	int snap_shot(std::wstring title);
+	Sheet* snap_shot(std::wstring title);
 	void invalidate();
 	void undo();
 	void redo();

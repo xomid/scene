@@ -12,7 +12,7 @@ enum class FileType {
 class ImageTranscoder
 {
 public:
-	int load(std::wstring filePath, Sheet& img, FileType& fileType);
-	int save(std::wstring filePath, Sheet& img, FileType fileType, int quality);
+	int load(std::wstring filePath, Sheet* img, FileType& fileType);
+	int save(std::wstring filePath, Sheet* img, FileType fileType, int quality);
 };
 

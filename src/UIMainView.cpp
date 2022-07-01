@@ -50,13 +50,14 @@ UIMainView::UIMainView()
 	visibleLeft(0), visibleTop(0), visibleRight(0), visibleBottom(0), document(0), image(0)
 {
 	bScrollable = true;
+	bShowDoc = false;
 }
 
 void UIMainView::set_document(Document* document) {
 	if (!document)
 		image = 0;
 	else
-		image = document->get_image();
+		image = document->get_frame();
 	this->document = document;
 }
 
@@ -70,9 +71,17 @@ void UIMainView::reset_view() {
 }
 
 void UIMainView::show_image(bool show) {
-	if (show && document) image = document->get_image();
+	bShowDoc = show;
+	if (show && document) image = document->get_frame();
 	else image = 0;
 	zoom(imgProps.scale);
+	invalidate();
+}
+
+void UIMainView::show_frame(bool show) {
+	if (!document) image = NULL;
+	else if (show) image = document->get_frame();
+	else image = document->get_image();
 	invalidate();
 }
 

@@ -23,6 +23,7 @@ public:
 	void save(std::wstring filePath);
 	void close_document(bool bForceClose);
 
+	void create_effect_windows();
 	void invalidate_document();
 	void on_init() override;
 	void on_resize(int width, int height) override;

@@ -8,6 +8,7 @@ UISideView::UISideView()
 void UISideView::set_document(Document* document) {
 	this->document = document;
 	mZoom->set_document(document);
+	mHisto->set_document(document);
 	if (document)
 		mOpen->populate_recent_files_list(document->get_file_manager());
 }

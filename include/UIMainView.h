@@ -14,7 +14,7 @@ class UIMainView : public OUI
 	Document* document;
 	Sheet* image;
 	ImageProperties imgProps;
-	bool bPressed;
+	bool bPressed, bShowDoc;
 	Drag<int, int> dragMgr;
 	Rect unmodifiedContentArea;
 	int clientWidth, clientHeight, scrollSize,
@@ -23,6 +23,7 @@ class UIMainView : public OUI
 public:
 	UIMainView();
 
+	void show_frame(bool show = true);
 	void show_image(bool show = false);
 	ZoomInfo get_zoom_info() const;
 	void set_zoom_info(ZoomInfo zInfo);

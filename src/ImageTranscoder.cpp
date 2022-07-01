@@ -18,8 +18,8 @@ void jpegErrorExit(j_common_ptr cinfo)
 	longjmp(myerr->setjmp_buffer, 1);
 }
 
-int read_jpeg(FILE* file, Sheet& img) {
-	if (file == NULL) return 1;
+int read_jpeg(FILE* file, Sheet* img) {
+	if (file == NULL || !img) return 1;
 	fseek(file, SEEK_SET, 0);
 
 	jpeg_decompress_struct info;
@@ -45,17 +45,17 @@ int read_jpeg(FILE* file, Sheet& img) {
 	imgHeight = info.output_height;
 	numComponents = info.num_components;
 
-	if (img.create(imgWidth, imgHeight, numComponents))
+	if (img->create(imgWidth, imgHeight, numComponents))
 		return 4;
 
 	/* Read scanline by scanline */
 	while (info.output_scanline < info.output_height) {
-		lpRowBuffer[0] = &img.data[info.output_scanline * img.pitch];
+		lpRowBuffer[0] = &img->data[info.output_scanline * img->pitch];
 		jpeg_read_scanlines(&info, lpRowBuffer, 1);
 
 		// rgb to bgr
 		auto d = lpRowBuffer[0];
-		for (int x = 0; x < img.w; ++x) {
+		for (int x = 0; x < img->w; ++x) {
 			auto t = *d;
 			d[0] = d[2];
 			d[2] = t;
@@ -69,7 +69,9 @@ int read_jpeg(FILE* file, Sheet& img) {
 	return 0;
 }
 
-int read_png(FILE* file, Sheet& img) {
+int read_png(FILE* file, Sheet* img) {
+	if (file == NULL || img == NULL) return 1;
+
 	png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!png)
 		return 1;
@@ -127,19 +129,19 @@ int read_png(FILE* file, Sheet& img) {
 	png_read_update_info(png, info);
 	int nbpp = png_get_channels(png, info); // default is rgb
 
-	if (img.create((int)width, (int)height, nbpp))
+	if (img->create((int)width, (int)height, nbpp))
 		return 4;
 
 	auto pitch = png_get_rowbytes(png, info);
 	row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * height);
 
-	if (row_pointers && img.data) {
+	if (row_pointers && img->data != NULL) {
 		for (y = 0; y < height; y++)
 			row_pointers[y] = (png_byte*)malloc(pitch);
 
 		png_read_image(png, row_pointers);
 		for (y = 0; y < height; ++y) {
-			auto d = img.data + y * img.pitch;
+			auto d = img->data + y * img->pitch;
 			memcpy(d, row_pointers[y], pitch);
 			free(row_pointers[y]);
 			row_pointers[y] = NULL;
@@ -161,8 +163,8 @@ FILE* get_file(std::wstring& filePath, const wchar* mode) {
 	return file;
 }
 
-int save_jpeg(FILE* file, Sheet& img, int quality) {
-	if (img.is_useless() || img.nbpp != 3) return 1;
+int save_jpeg(FILE* file, Sheet* img, int quality) {
+	if (img == NULL || img->is_useless() || img->nbpp != 3) return 1;
 
 	jpeg_compress_struct cinfo;
 	jpegErrorManager jerr;
@@ -178,8 +180,8 @@ int save_jpeg(FILE* file, Sheet& img, int quality) {
 	jpeg_create_compress(&cinfo);
 	jpeg_stdio_dest(&cinfo, file);
 
-	cinfo.image_width = img.w;
-	cinfo.image_height = img.h;
+	cinfo.image_width = img->w;
+	cinfo.image_height = img->h;
 	cinfo.input_components = 3;
 	cinfo.in_color_space = JCS_EXT_BGR;
 	jpeg_set_defaults(&cinfo);
@@ -187,7 +189,7 @@ int save_jpeg(FILE* file, Sheet& img, int quality) {
 	jpeg_start_compress(&cinfo, TRUE);
 
 	while (cinfo.next_scanline < cinfo.image_height) {
-		auto buffer = &img.data[cinfo.next_scanline * img.pitch];
+		auto buffer = &img->data[cinfo.next_scanline * img->pitch];
 		jpeg_write_scanlines(&cinfo, &buffer, 1);
 	}
 
@@ -196,7 +198,8 @@ int save_jpeg(FILE* file, Sheet& img, int quality) {
 	return 0;
 }
 
-int save_png(FILE* file, Sheet& img) {
+int save_png(FILE* file, Sheet* img) {
+	if (img == NULL || file == NULL) return 1;
 
 	png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!png)
@@ -213,8 +216,8 @@ int save_png(FILE* file, Sheet& img) {
 
 	png_set_IHDR(png,
 		info,
-		img.w,
-		img.h,
+		img->w,
+		img->h,
 		8,
 		PNG_COLOR_TYPE_RGB,
 		PNG_INTERLACE_NONE,
@@ -222,10 +225,10 @@ int save_png(FILE* file, Sheet& img) {
 		PNG_FILTER_TYPE_BASE);
 
 	png_bytep* row_pointers = NULL;
-	row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * img.h);
+	row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * img->h);
 
-	for (int y = 0; y < img.h; ++y) {
-		row_pointers[y] = img.data + y * img.pitch;
+	for (int y = 0; y < img->h; ++y) {
+		row_pointers[y] = img->data + y * img->pitch;
 	}
 
 	png_init_io(png, file);
@@ -235,7 +238,9 @@ int save_png(FILE* file, Sheet& img) {
 	return 0;
 }
 
-int ImageTranscoder::load(std::wstring filePath, Sheet& img, FileType& fileType) {
+int ImageTranscoder::load(std::wstring filePath, Sheet* img, FileType& fileType) {
+	if (img == NULL) return 1;
+
 	auto file = get_file(filePath, L"rb");
 	if (file == NULL) return 1;
 
@@ -256,7 +261,9 @@ int ImageTranscoder::load(std::wstring filePath, Sheet& img, FileType& fileType)
 	return fileType == FileType::OTHER ? 1 : 0;
 }
 
-int ImageTranscoder::save(std::wstring filePath, Sheet& img, FileType fileType, int quality) {
+int ImageTranscoder::save(std::wstring filePath, Sheet* img, FileType fileType, int quality) {
+	if (img == NULL) return 1;
+
 	auto file = get_file(filePath, L"wb");
 	if (file == NULL) return 1;
 

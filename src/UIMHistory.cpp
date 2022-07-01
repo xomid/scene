@@ -9,20 +9,22 @@ void UIMHistory::on_init() {
 	UIComMenu::on_init();
 }
 
-void UIMHistory::set_history(History* history) {
-	this->history = history;
+void UIMHistory::set_document(Document* document) {
+	this->document = document;
 }
 
 void UIMHistory::update_history_list() {
 	list.elements.clear();
+	if (!document) return;
+
 	int w = list.boxModel.width - 10;
 	int h = 50;
 	bool bFirst = true;
 	Spacing padding;
 
 	padding.set(4);
-
-	for (auto item : *history) {
+	auto& history = *document->get_history();
+	for (auto& item : history) {
 		auto btn = new UIButtonWithThumbnail();
 		if (bFirst) {
 			bFirst = false;

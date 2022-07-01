@@ -2,6 +2,15 @@
 #include <oui_uix.h>
 #include "UIDOpenFile.h"
 #include "UIDSaveFile.h"
+#include "UIDContBright.h"
+
+UIDContBright dlgContBright;
+
+void UIContainer::create_effect_windows() {
+	dlgContBright.create(this);
+	dlgContBright.set_document(&document);
+	dlgContBright.show();
+}
 
 void UIContainer::on_init()
 {
@@ -27,7 +36,6 @@ void UIContainer::on_init()
 	dlgCloseWithoutSave.create(300, 100, this, DialogButtonSet::Yes_No);
 	dlgCloseWithoutSave.set_title(L"Unsaved Changes");
 	dlgCloseWithoutSave.set_text(L"Foo");
-	uix->apply_theme_all();
 
 	fileMgr.load_db(L"C:\\dev\\scene");
 	document.set_file_manager(&fileMgr);
@@ -35,14 +43,22 @@ void UIContainer::on_init()
 	sideView.set_document(&document);
 	sideView.config_elements_based_on_document_status();
 
-	//sideView.mZoom->pop_up();
-	//load(L"C:\\Users\\Omid\\Pictures\\6.jpg");
-	//save(L"C:\\Users\\Omid\\Pictures\\6-png.png");
+	load(L"C:\\Users\\Omid\\Pictures\\6.jpg");
 
-	//uix->show_box_model();
+	create_effect_windows();
+	uix->apply_theme_all();
 }
 
 void UIContainer::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
+
+	if (element == &dlgContBright) {
+		if (message == Event::Click) {
+			mainView.show_frame(param);
+		}
+		mainView.invalidate();
+	}
+
+
 	if (message == UIOPEN_UPDATE) {
 		if (param == 0) {
 			UIDOpenFile dlgOpen;
@@ -89,9 +105,12 @@ void UIContainer::process_event(OUI* element, uint32_t message, uint64_t param, 
 		save(filePath);
 	}
 	else if (message == UISIDE_CLOSE_DOCUMENT) {
-		if (document.is_invalidated())
-			dlgCloseWithoutSave.show_window();
-		else close_document(false);// this is guraranteed to close it because it is not invalidated i.e saved
+
+		dlgContBright.show();
+
+		//if (document.is_invalidated())
+		//	dlgCloseWithoutSave.show_window();
+		//else close_document(false);// this is guraranteed to close it because it is not invalidated i.e saved
 	}
 	else if (element == &mainView) {
 		auto zInfo = mainView.get_zoom_info();
@@ -133,6 +152,7 @@ void UIContainer::process_event(OUI* element, uint32_t message, uint64_t param, 
 	}
 }
 
+
 void UIContainer::on_resize(int width, int height) {
 	int w = boxModel.width;
 	int h = boxModel.height;
@@ -150,8 +170,8 @@ void UIContainer::load(std::wstring filePath) {
 	auto zInfo = mainView.get_zoom_info();
 	sideView.mZoom->set_scale_range(mainView.get_min_scale(), mainView.get_max_scale());
 	sideView.mZoom->set_zoom_info(zInfo);
-
-	//sideView.mHisto->update_history_list();
+	
+	sideView.mHisto->update_history_list();
 }
 
 void UIContainer::save(std::wstring filePath) {
