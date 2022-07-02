@@ -6,6 +6,7 @@ void History::clear() {
 		delete list[i];
 	}
 	list.clear();
+	list.shrink_to_fit();
 	head = 0;
 }
 
@@ -19,9 +20,8 @@ void History::push(Sheet* srcImage, std::wstring title) {
 	}
 
 	HistoryEntry* newEntry = new HistoryEntry();
-	newEntry->image = new Sheet();
+	newEntry->image = srcImage;
 	newEntry->title = title;
-	newEntry->image->clone(srcImage);
 	list.push_back(newEntry);
 	head = list.size() - 1;
 }

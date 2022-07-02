@@ -8,12 +8,14 @@ class UIZoom : public UIButton
 	ZoomInfo zInfo;
 	Rect rcZoom, rcImage, rcZoomClipped;
 	Document* document;
-	Sheet* srcImage;
 	Border zoomBorder;
 	byte zoomBorderOpacity;
 	Drag<double, double> dragMgr;
 
+	Sheet* get_image() const;
+
 public:
+
 	void on_init() override;
 	void on_update() override;
 	void set_document(Document* document);

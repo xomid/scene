@@ -26,6 +26,7 @@ public:
 	Sheet* get_frame();
 	History* get_history();
 
+	void reset_frame();
 	int load(std::wstring path);
 	int save(std::wstring path);
 	int close(bool bForceClose);

@@ -2,14 +2,26 @@
 #include <oui_uix.h>
 #include "UIDOpenFile.h"
 #include "UIDSaveFile.h"
-#include "UIDContBright.h"
-
-UIDContBright dlgContBright;
 
 void UIContainer::create_effect_windows() {
+	dlgProgress.create(300, 20, this);
+	dlgProgress.set_progress(0.);
+
+	dlgContBright.config(3, 3);
+
 	dlgContBright.create(this);
 	dlgContBright.set_document(&document);
-	dlgContBright.show();
+
+	show_effect(&dlgContBright);
+}
+
+void UIContainer::show_effect(UIDEffect* dlgEffect) {
+	if (dlgEffect) {
+		currEffectDlg = dlgEffect;
+		dlgProgress.set_title(dlgEffect->title);
+		dlgProgress.move(0, 0);
+		dlgEffect->show();
+	}
 }
 
 void UIContainer::on_init()
@@ -27,6 +39,11 @@ void UIContainer::on_init()
 	OUITheme::border.set(Color("#aaa"));
 	OUITheme::text.set(Color("#444"));
 
+	bCopyResult = false;
+	bApplyThreadRunning = false;
+	progressBlockCount = 100;
+	progress = 0.;
+	currEffectDlg = NULL;
 	sw = 45;
 	int w = boxModel.width;
 	int h = boxModel.height;
@@ -57,9 +74,10 @@ void UIContainer::process_event(OUI* element, uint32_t message, uint64_t param, 
 		}
 		mainView.invalidate();
 	}
-
-
-	if (message == UIOPEN_UPDATE) {
+	else if (message == UIDEFFECT_UPDATE) {
+		mainView.invalidate();
+	}
+	else if (message == UIOPEN_UPDATE) {
 		if (param == 0) {
 			UIDOpenFile dlgOpen;
 			dlgOpen.set_type_index(1);
@@ -105,7 +123,6 @@ void UIContainer::process_event(OUI* element, uint32_t message, uint64_t param, 
 		save(filePath);
 	}
 	else if (message == UISIDE_CLOSE_DOCUMENT) {
-
 		dlgContBright.show();
 
 		//if (document.is_invalidated())
@@ -152,6 +169,9 @@ void UIContainer::process_event(OUI* element, uint32_t message, uint64_t param, 
 	}
 }
 
+void UIContainer::update_history_list() {
+	sideView.mHisto->update_history_list();
+}
 
 void UIContainer::on_resize(int width, int height) {
 	int w = boxModel.width;
@@ -170,8 +190,8 @@ void UIContainer::load(std::wstring filePath) {
 	auto zInfo = mainView.get_zoom_info();
 	sideView.mZoom->set_scale_range(mainView.get_min_scale(), mainView.get_max_scale());
 	sideView.mZoom->set_zoom_info(zInfo);
-	
-	sideView.mHisto->update_history_list();
+
+	update_history_list();
 }
 
 void UIContainer::save(std::wstring filePath) {
@@ -195,9 +215,81 @@ void UIContainer::on_window_closed(UIWindow* window, size_t wmsg) {
 			close_document(true);
 		}
 	}
+	else if (window == currEffectDlg) {
+		if (wmsg == DialogButtonId::OK) {
+			progress = 0.;
+			bCopyResult = false;
+			bApplyThreadRunning = true;
+			std::thread thread(&UIContainer::apply_thread, this);
+			thread.detach();
+			tempImage.free();
+			set_timer(1, 100);
+		}
+		else if (wmsg == DialogButtonId::Cancel) {
+			document.reset_frame();
+		}
+	}
+}
+
+void UIContainer::on_timer(uint32_t nTimer) {
+	if (bUpdateProgress) {
+		dlgProgress.set_progress(progress);
+		bUpdateProgress = false;
+	}
+
+	if (bCopyResult) {
+		bCopyResult = false;
+		kill_timer(1);
+		copy_result();
+	}
+}
+
+void UIContainer::copy_result() {
+	auto dstImage = document.snap_shot(currEffectDlg->title);
+	if (dstImage)
+		dstImage->copy(&tempImage);
+	document.reset_frame();
+
+	dlgProgress.show_window(false);
+	update_history_list();
+	sideView.config_elements_based_on_document_status();
+	invalidate();
 }
 
 void UIContainer::invalidate_document() {
 	document.invalidate();
 	sideView.mSave->enable_element(0, document.is_open());
+}
+
+void UIContainer::apply_thread() {
+	if (currEffectDlg == NULL) return;
+
+	auto srcImage = document.get_image();
+	auto dstImage = &tempImage;
+
+	dstImage->clone(srcImage);
+
+	using namespace std::chrono_literals;
+	size_t verticalBlockIndex, horizontalBlockIndex;
+	int blockLeft, blockTop, blockRight, blockBottom, blockHeight;
+
+	blockHeight = int(ceil((double)srcImage->h / (double)progressBlockCount));
+	blockTop = 0;
+
+	// entire line
+	blockLeft = 0;
+	blockRight = srcImage->w;
+	auto progressBlockCount1 = progressBlockCount - 1;
+
+	for (verticalBlockIndex = 0; verticalBlockIndex < progressBlockCount; ++verticalBlockIndex, blockTop += blockHeight) {
+		blockBottom = blockTop + blockHeight;
+		if (verticalBlockIndex == progressBlockCount1)
+			blockBottom = srcImage->h;
+		currEffectDlg->render(srcImage, dstImage, blockLeft, blockTop, blockRight, blockBottom);
+		progress = (double)verticalBlockIndex / (double)(progressBlockCount1);
+		bUpdateProgress = true;
+	}
+
+	bCopyResult = true;
+	bApplyThreadRunning = false;
 }

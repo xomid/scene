@@ -1,5 +1,5 @@
 #include "UIMHistory.h"
-#include "UIButtonWithThumbnail.h"
+#include <oui_uix.h>
 
 void UIMHistory::on_init() {
 	boxModel.width = MENU_WIDTH;
@@ -14,7 +14,15 @@ void UIMHistory::set_document(Document* document) {
 }
 
 void UIMHistory::update_history_list() {
+	for (auto historyItem : historyItems) {
+		uix->delete_element(historyItem);
+	}
+
+	historyItems.clear();
+	historyItems.shrink_to_fit();
 	list.elements.clear();
+	list.elements.shrink_to_fit();
+
 	if (!document) return;
 
 	int w = list.boxModel.width - 10;
@@ -41,7 +49,11 @@ void UIMHistory::update_history_list() {
 		btn->set_thumbnail(img->data, img->w, img->h, img->pitch, img->nbpp);
 		btn->transform(false);
 		btn->set_thumb_padding(padding);
+
+		historyItems.push_back(btn);
 	}
+
+	invalidate();
 }
 
 void UIMHistory::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {

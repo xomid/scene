@@ -1,6 +1,5 @@
 #include "UIDContBright.h"
-#include "BrightnessData.h"
-#include "ContrastData.h"
+#include "ImageEffect.h"
 
 void UIDContBright::measure_size(int* width, int* height) {
 	if (width) *width = 360;
@@ -13,10 +12,12 @@ void UIDContBright::on_init() {
 	chkLegacy.create(0, 0, 10, 10, this);
 
 	scBright.set_text(L"Brightness");
-	scBright.config(0, 1, -150, 150);
+	brightness = 0;
+	scBright.config((int)brightness, 1, -150, 150);
 
 	scContst.set_text(L"Contrast");
-	scContst.config(0, 1, -100, 100);
+	contrast = 0;
+	scContst.config((int)contrast, 1, -100, 100);
 
 	chkLegacy.set_text(L"Legacy");
 	chkLegacy.select(bLegacy = true);
@@ -40,9 +41,11 @@ void UIDContBright::on_resize(int width, int height) {
 
 void UIDContBright::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &scBright) {
+		brightness = scBright.get_value();
 		bInvalidate = true;
 	}
 	else if (element == &scContst) {
+		contrast = scContst.get_value();
 		bInvalidate = true;
 	}
 	else if (element == &chkLegacy) {
@@ -66,79 +69,17 @@ void UIDContBright::process_event(OUI* element, uint32_t message, uint64_t param
 		UIDEffect::process_event(element, message, param, bubbleUp);
 	}
 
-	while (bInvalidate) {
-	}
-
-	parent->process_event(this, Event::Update, 0, true);
+	//parent->process_event(this, Event::Update, 0, true);
 }
 
 void UIDContBright::apply() {
 
 }
 
-void UIDContBright::render() {
-	if (!document) return;
-
-	auto image = document->get_image();
-	auto frame = document->get_frame();
-
-	unsigned char blookup[256] = { 0 };
-	unsigned char clookup[256] = { 0 };
-
-	int brightness = scBright.get_value();
-	int contrast = scContst.get_value();
-	int x, y, w, h, p, n, i;
-	double slope;
-	pyte d, s;
-
-	if (bLegacy)
-	{
-		x = y = 0;
-
-		if (contrast >= 0) {
-			x = (abs(contrast) / 100.0) * 127.5;
-			n = (2 * (127.5 - x));
-			slope = 255.0 / n;
-			n = x + n;
-
-			for (i = x; i <= n; i++) {
-				y = (i - x) * slope + 0.5;
-				clookup[i] = y;
-			}
-			for (i = 0; i < x; i++) clookup[i] = 0;
-			for (i = n + 1; i < 256; i++) clookup[i] = 255;
-			for (i = 0; i < 256; i++) blookup[i] = CLAMP255(i + brightness);
-
-		}
-		else {
-			y = (abs(contrast) / 100.0) * 127.5;
-			slope = (2.0 * (127 - y)) / 255.0;
-			for (i = 0; i < 256; i++) blookup[i] = y + (i * slope + 0.5);
-			for (i = 0; i < 256; i++) clookup[i] = CLAMP255(i + brightness);
-		}
-
-	}
-	else
-	{
-		memcpy(blookup, BrightnessData[brightness + 150], 256);
-		memcpy(clookup, ContrastData[contrast + 50], 256);
-	}
-
-	if (image && frame) {
-		w = image->w;
-		h = image->h;
-		p = image->pitch;
-
-		for (y = 0; y < h; ++y) {
-			s = image->data + y * p;
-			d = frame->data + y * p;
-			for (x = 0; x < w; ++x) {
-				*d++ = clookup[blookup[*s++]];
-				*d++ = clookup[blookup[*s++]];
-				*d++ = clookup[blookup[*s++]];
-			}
-		}
-	}
+void UIDContBright::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom) 
+{
+	ImageEffect::brightness_contrast(srcImage, dstImage, &blob, bLegacy, brightness, contrast,
+		blockLeft, blockTop, blockRight, blockBottom);
 }
 
 

@@ -20,7 +20,7 @@ void UIComplexS::on_init() {
 	number.create(0, 0, 10, 10, this);
 	slide.create(0, 0, 10, 10, this);
 
-	number.border.set(1, Colors::orange);
+	number.border.set(1, backgroundColor.bright(-30));
 	label.canvas.art.alignX = Align::LEFT;
 	config(0, 1, 0, 1);
 }
@@ -47,6 +47,7 @@ void UIComplexS::process_event(OUI* element, uint32_t message, uint64_t param, b
 	}
 	else return;
 
-	if (parent)
+	if (parent) {
 		parent->process_event(this, Event::Update, 0, true);
+	}
 }

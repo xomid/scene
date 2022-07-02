@@ -2,12 +2,15 @@
 #include "UIComMenu.h"
 #include "History.h"
 #include "Document.h"
+#include "UIButtonWithThumbnail.h"
 
 #define UIHISTO_UPDATE (Event::_last + 7)
 
 class UIMHistory : public UIComMenu
 {
 	Document* document;
+	std::vector<UIButtonWithThumbnail*> historyItems;
+
 public:
 	void on_init() override;
 	void set_document(Document* document);

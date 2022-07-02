@@ -3,7 +3,6 @@
 
 void UIZoom::on_init() {
 	document = 0;
-	srcImage = 0;
 	zInfo.reset();
 	rcZoom.set(0, 0, 10, 10);
 	border.set(1, Colors::purple);
@@ -13,7 +12,6 @@ void UIZoom::on_init() {
 
 void UIZoom::set_document(Document* document) {
 	this->document = document;
-	this->srcImage = document ? document->get_image() : 0;
 	invalidate();
 }
 
@@ -23,7 +21,9 @@ ZoomInfo UIZoom::get_zoom_info() const {
 
 void UIZoom::set_zoom_info(ZoomInfo zInfo) {
 	this->zInfo = zInfo;
-	if (srcImage && document->is_open()) {
+
+	Sheet* srcImage = get_image();
+	if (srcImage) {
 		int l, t, w, h;
 		double rat = srcImage->w / double(srcImage->h);
 		w = contentArea.width;
@@ -52,7 +52,8 @@ void UIZoom::set_zoom_info(ZoomInfo zInfo) {
 }
 
 void UIZoom::on_update() {
-	if (srcImage && document->is_open()) {
+	Sheet* srcImage = get_image();
+	if (srcImage) {
 		bit_blt_fill_rest(&area, canvas.sheet, contentArea.left + rcImage.left, contentArea.top + rcImage.top,
 			rcImage.width, rcImage.height,
 			*srcImage, 0, 0, srcImage->w, srcImage->h,
@@ -66,7 +67,8 @@ void UIZoom::on_update() {
 }
 
 void UIZoom::on_resize(int width, int height) {
-	if (srcImage && document->is_open()) {
+	Sheet* srcImage = get_image();
+	if (srcImage) {
 		set_zoom_info(zInfo);
 	}
 	else {
@@ -75,8 +77,14 @@ void UIZoom::on_resize(int width, int height) {
 	invalidate();
 }
 
+Sheet* UIZoom::get_image() const {
+	if (document == NULL || !document->is_open()) return NULL;
+	return document->get_image();
+}
+
 void UIZoom::on_mouse_down(int x, int y, uint32_t flags) {
-	if (!srcImage || !document->is_open()) return;
+	Sheet* srcImage = get_image();
+	if (srcImage == NULL) return;
 
 	UIButton::on_mouse_down(x, y, flags);
 
@@ -93,14 +101,16 @@ void UIZoom::on_mouse_down(int x, int y, uint32_t flags) {
 }
 
 void UIZoom::on_mouse_up(int x, int y, uint32_t flags) {
-	if (!srcImage || !document->is_open()) return;
+	Sheet* srcImage = get_image();
+	if (srcImage == NULL) return;
 
 	UIButton::on_mouse_up(x, y, flags);
 	dragMgr.stopDragging();
 }
 
 void UIZoom::on_mouse_move(int x, int y, uint32_t flags) {
-	if (!srcImage || !document->is_open()) return;
+	Sheet* srcImage = get_image();
+	if (srcImage == NULL) return;
 
 	if (bPressed) {
 		double fx = (x - rcImage.left) / double(rcImage.width);
@@ -118,7 +128,8 @@ void UIZoom::on_mouse_move(int x, int y, uint32_t flags) {
 }
 
 void UIZoom::alert_parent(uint32_t message) {
-	if (!srcImage || !document->is_open()) return;
+	Sheet* srcImage = get_image();
+	if (srcImage == NULL) return;
 
 	if (parent)
 		parent->process_event(this, Event::Update, 0, true);

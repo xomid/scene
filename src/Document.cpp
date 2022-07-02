@@ -63,6 +63,10 @@ void Document::invalidate() {
 	bInvalidated = true;
 }
 
+void Document::reset_frame() {
+	frame.copy(image);
+}
+
 Sheet* Document::snap_shot(std::wstring title) {
 	auto newImage = new Sheet();
 	if (newImage == NULL) return NULL;
@@ -124,14 +128,16 @@ int Document::save(std::wstring filePath) {
 void Document::undo() {
 	auto chkImage = history.undo();
 	if (!chkImage) return;
-	frame.copy(image = chkImage->image);
+	image = chkImage->image;
+	reset_frame();
 	bInvalidated = true;
 }
 
 void Document::redo() {
 	auto chkImage = history.redo();
 	if (!chkImage) return;
-	frame.copy(image = chkImage->image);
+	image = chkImage->image;
+	reset_frame();
 	bInvalidated = true;
 }
 
@@ -139,6 +145,7 @@ void Document::checkout(size_t historyIndex) {
 	if (historyIndex == history.get_head_index()) return;
 	auto chkImage = history.get(historyIndex);
 	if (!chkImage) return;
-	frame.copy(image = chkImage->image);
+	image = chkImage->image;
+	reset_frame();
 	bInvalidated = true;
 }

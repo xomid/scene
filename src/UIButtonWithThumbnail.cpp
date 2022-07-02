@@ -7,12 +7,7 @@ UIButtonWithThumbnail::~UIButtonWithThumbnail() {
 }
 
 void UIButtonWithThumbnail::set_thumbnail(byte* thumbData, int width, int height, int pitch, int nbpp) {
-	thumb.data = thumbData;
-	thumb.w = thumb.sw = width;
-	thumb.h = thumb.sh = height;
-	thumb.nbpp = nbpp;
-	thumb.pitch = pitch;
-
+	thumb.attach(thumbData, width, height, pitch, nbpp);
 	transform(big = true);
 }
 
