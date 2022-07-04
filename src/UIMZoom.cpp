@@ -11,7 +11,7 @@ void UIMZoom::on_init() {
 	list.show_window(false);
 
 	int w, h;
-	view.create(0, 0, 10, 10, this);
+	view.create(this);
 	view.margin.set(5, 10);
 
 	h = 30;
@@ -21,7 +21,7 @@ void UIMZoom::on_init() {
 	numScale.create(0, 0, w, h, this);
 	lblPercent.create(0, 0, 10, h, this);
 
-	slide.create(0, 0, 10, 10, this);
+	slide.create(this);
 
 	numScale.set_text(L"100");
 	btnUp.set_text(L"+");

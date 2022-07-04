@@ -2,13 +2,10 @@
 #include "UIDEffect.h"
 #include "UIComplexS.h"
 
-class UIDContBright : public UIDEffect
+class UIDPosterize : public UIDEffect
 {
-	UIComplexS scBright, scContst;
-	UICheck chkLegacy;
-	bool bLegacy;
-	int brightness, contrast;
-	BrightnessContrastBlob blob;
+	UIComplexS cLevels;
+	int threshold;
 
 public:
 	void measure_size(int* width, int* height) override;

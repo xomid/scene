@@ -6,8 +6,17 @@
 #include "History.h"
 #include "FileManager.h"
 #include <UIDFile.h>
-#include "UIDContBright.h"
 #include "UIDProgress.h"
+
+#include "UIDContBright.h"
+#include "UIDChannelMixer.h"
+#include "UIDColorBalance.h"
+#include "UIDCurves.h"
+#include "UIDHSL.h"
+#include "UIDLevels.h"
+#include "UIDPosterize.h"
+#include "UIDThreshold.h"
+
 
 class UIContainer : public OUI
 {
@@ -18,6 +27,13 @@ class UIContainer : public OUI
 	UIDialog dlgCloseWithoutSave;
 	UIDProgress dlgProgress;
 	UIDContBright dlgContBright;
+	UIDChannelMixer dlgChannelMixer;
+	UIDColorBalance dlgColorBalance;
+	UIDCurves dlgCurves;
+	UIDHSL dlgHSL;
+	UIDLevels dlgLevels;
+	UIDPosterize dlgPosterize;
+	UIDThreshold dlgThreshold;
 	UIDEffect* currEffectDlg;
 
 	std::vector<FileDialogFileType> fileTypes;
@@ -36,6 +52,7 @@ public:
 	void close_document(bool bForceClose);
 	void show_effect(UIDEffect* dlgEffect);
 	void update_history_list();
+	void update_image_dependant_elements();
 
 	void create_effect_windows();
 	void invalidate_document();

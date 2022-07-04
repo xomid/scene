@@ -1,6 +1,6 @@
 #pragma once
 #include <oui_stack.h>
-#include "UISeperator.h"
+#include "UISeparator.h"
 #include "UIButtonWithMenu.h"
 #include "UIMOpen.h"
 #include "UIMSave.h"
@@ -15,7 +15,7 @@
 class UISideView : public UIStack
 {
 public:
-	UISeperator sp1, sp2, sp3;
+	UISeparator sp1, sp2, sp3;
 	UIButtonWithBorderOnHover btnClose, btnRedo, btnUndo, btnInfo;
 	UIButtonWithMenu btnOpen, btnSave, btnAdj, btnFilter, btnHistory, btnZoom;
 	UIMOpen* mOpen;

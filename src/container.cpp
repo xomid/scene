@@ -4,15 +4,35 @@
 #include "UIDSaveFile.h"
 
 void UIContainer::create_effect_windows() {
-	dlgProgress.create(300, 20, this);
+	/*dlgProgress.create(300, 20, this);
 	dlgProgress.set_progress(0.);
 
 	dlgContBright.config(3, 3);
 
 	dlgContBright.create(this);
-	dlgContBright.set_document(&document);
+	dlgChannelMixer.create(this);
+	dlgColorBalance.create(this);
+	dlgCurves.create(this);
+	dlgHSL.create(this);
+	dlgLevels.create(this);
+	dlgPosterize.create(this);
+	dlgThreshold.create(this);*/
 
-	show_effect(&dlgContBright);
+	/*dlgContBright.set_document(&document);
+	dlgChannelMixer.set_document(&document);
+	dlgColorBalance.set_document(&document);
+	dlgCurves.set_document(&document);
+	dlgHSL.set_document(&document);
+	dlgLevels.set_document(&document);
+	dlgPosterize.set_document(&document);
+	dlgThreshold.set_document(&document);*/
+
+	dlgThreshold.create(this);
+	dlgThreshold.set_document(&document);
+
+	show_effect(&dlgThreshold);
+
+	//uix->show_box_model();
 }
 
 void UIContainer::show_effect(UIDEffect* dlgEffect) {
@@ -35,7 +55,7 @@ void UIContainer::on_init()
 	};
 
 	OUITheme::primary.set(Color("#eee"));
-	OUITheme::secondary.set(Color("#ddd"));
+	OUITheme::secondary.set(Color("#e9e9e9"));
 	OUITheme::border.set(Color("#aaa"));
 	OUITheme::text.set(Color("#444"));
 
@@ -161,8 +181,10 @@ void UIContainer::process_event(OUI* element, uint32_t message, uint64_t param, 
 			else document.checkout((size_t)high);
 
 			bool bDocumentNeedsInvalidation = document.is_invalidated();
-			if (bDocumentNeedsInvalidation)
+			if (bDocumentNeedsInvalidation) {
+				update_image_dependant_elements();
 				invalidate_document();
+			}
 
 			invalidate();
 		}
@@ -192,6 +214,18 @@ void UIContainer::load(std::wstring filePath) {
 	sideView.mZoom->set_zoom_info(zInfo);
 
 	update_history_list();
+	update_image_dependant_elements();
+}
+
+void UIContainer::update_image_dependant_elements() {
+	dlgContBright.reset_image();
+	dlgChannelMixer.reset_image();
+	dlgColorBalance.reset_image();
+	dlgCurves.reset_image();
+	dlgHSL.reset_image();
+	dlgLevels.reset_image();
+	dlgPosterize.reset_image();
+	dlgThreshold.reset_image();
 }
 
 void UIContainer::save(std::wstring filePath) {
@@ -252,6 +286,7 @@ void UIContainer::copy_result() {
 
 	dlgProgress.show_window(false);
 	update_history_list();
+	update_image_dependant_elements();
 	sideView.config_elements_based_on_document_status();
 	invalidate();
 }

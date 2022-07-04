@@ -2,11 +2,11 @@
 #include <oui_number.h>
 #include <UISlide.h>
 
-class UIComplexS : public OUI
+class UIComplexP : public OUI
 {
 	UILinearSlide slide;
 	UINumber number;
-	UILabel label;
+	UILabel label, lblPercent;
 public:
 	void config(double value, double step, double minValue, double maxValue);
 	double get_value() const;

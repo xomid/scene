@@ -1,16 +1,26 @@
 #pragma once
 #include "UIDEffect.h"
 #include "UIComplexS.h"
+#include "UICurve.h"
+#include "UIGradient.h"
+#include <oui_group.h>
+#include <oui_radio.h>
+#include <oui_select.h>
 
-class UIDContBright : public UIDEffect
+class UIDCurves : public UIDEffect
 {
-	UIComplexS scBright, scContst;
-	UICheck chkLegacy;
-	bool bLegacy;
-	int brightness, contrast;
-	BrightnessContrastBlob blob;
+	UISelect<UISelectDefaultMenu> selPreset, selChannel;
+	UIGroup grpModes;
+	UIRadio rdCurve, rdPoint;
+	UICurve cCurve;
+	UIGradient gradLeft, gradBottom;
+	CurvesBlob blob;
+	bool bCurve;
 
 public:
+	void calc_lookup_tables();
+	void load_preset(size_t presetId);
+	void reset_image() override;
 	void measure_size(int* width, int* height) override;
 	void on_init() override;
 	void on_resize(int width, int height) override;

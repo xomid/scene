@@ -2,13 +2,13 @@
 #include "UIDEffect.h"
 #include "UIComplexS.h"
 
-class UIDContBright : public UIDEffect
+class UIDColorBalance : public UIDEffect
 {
-	UIComplexS scBright, scContst;
-	UICheck chkLegacy;
-	bool bLegacy;
-	int brightness, contrast;
-	BrightnessContrastBlob blob;
+	UIComplexS cRed, cGreen, cBlue;
+	UICheck chkPreserveLum;
+	bool bPreserveLum;
+	int red, green, blue;
+	ColorBalanceBlob blob;
 
 public:
 	void measure_size(int* width, int* height) override;

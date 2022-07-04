@@ -18,7 +18,6 @@ protected:
 	UICheck chkPreview;
 	Document* document;
 	bool bPreview, bRenderThreadRunning, bInvalidate, bTerminate, bUpdateView, bViewUpdated;
-	BrightnessContrastBlob blob;
 
 	// this is a dummy function and is used so that compiler 
 	// doesnt optimize away an empty useless while loop
@@ -29,13 +28,13 @@ protected:
 public:
 	void on_resize(int width, int height) override;
 	void process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) override;
-	void set_document(Document* document);
 	void cancel();
 	void close(uint32_t wmsg) override;
 	void create(OUI* caller);
 	void on_timer(uint32_t nTimer) override;
 
+	virtual void reset_image();
+	virtual void set_document(Document* document);
 	virtual void show(bool bShow = true);
-	virtual void apply() = 0;
 	virtual void render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom) = 0;
 };

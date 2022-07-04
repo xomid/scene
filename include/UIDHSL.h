@@ -1,16 +1,20 @@
 #pragma once
 #include "UIDEffect.h"
 #include "UIComplexS.h"
+#include <oui_select.h>
 
-class UIDContBright : public UIDEffect
+class UIDHSL : public UIDEffect
 {
-	UIComplexS scBright, scContst;
-	UICheck chkLegacy;
-	bool bLegacy;
-	int brightness, contrast;
-	BrightnessContrastBlob blob;
+	UISelect<UISelectDefaultMenu> selPreset;
+	UIComplexS cHue, cSaturation, cLightness;
+	UICheck chkColorize;
+	bool bColorize;
+	int hue, saturation, lightness;
+	HSLBlob blob;
 
 public:
+	void colorize();
+	void load_preset(size_t presetId);
 	void measure_size(int* width, int* height) override;
 	void on_init() override;
 	void on_resize(int width, int height) override;

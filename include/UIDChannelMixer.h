@@ -1,15 +1,18 @@
 #pragma once
 #include "UIDEffect.h"
-#include "UIComplexS.h"
+#include "UIComplexP.h"
+#include <oui_select.h>
 
-class UIDContBright : public UIDEffect
+class UIDChannelMixer : public UIDEffect
 {
-	UIComplexS scBright, scContst;
-	UICheck chkLegacy;
-	bool bLegacy;
-	int brightness, contrast;
-	BrightnessContrastBlob blob;
+	UISelect<UISelectDefaultMenu> selPreset, selOutChannel;
+	UIComplexP cRed, cGreen, cBlue;
+	UICheck chkMono, chkPreserveLum;
+	bool bMono, bPreserveLum;
+	int red, green, blue;
+	ChannelMixerBlob blob;
 
+	void reset_output_channel_menu();
 public:
 	void measure_size(int* width, int* height) override;
 	void on_init() override;

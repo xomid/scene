@@ -9,6 +9,9 @@ void UIDEffect::config(size_t horizontalBlockCount, size_t verticalBlockCount)
 	UIDEffect::verticalBlockCount = verticalBlockCount;
 }
 
+void UIDEffect::reset_image() {
+}
+
 void UIDEffect::create(OUI* caller) {
 	int width = 300, height = 200;
 	measure_size(&width, &height);
@@ -47,6 +50,7 @@ void UIDEffect::process_event(OUI* element, uint32_t message, uint64_t param, bo
 
 void UIDEffect::set_document(Document* document) {
 	this->document = document;
+	reset_image();
 }
 
 void UIDEffect::cancel() {
@@ -109,6 +113,9 @@ void UIDEffect::render_thread() {
 
 				auto srcImage = document->get_image();
 				auto dstImage = document->get_frame();
+
+				if (srcImage == NULL || dstImage == NULL) 
+					return;
 
 				size_t verticalBlockIndex, horizontalBlockIndex;
 				int blockLeft, blockTop, blockRight, blockBottom, blockHeight, blockWidth;

@@ -1,7 +1,7 @@
 #pragma once
 #include "UIComMenu.h"
 #include "UIButtonWithBorderOnHover.h"
-#include "UISeperator.h"
+#include "UISeparator.h"
 #include "FileManager.h"
 
 #define UIOPEN_UPDATE (Event::_last + 1)
@@ -14,7 +14,7 @@ public:
 class UIMOpen : public UIComMenu
 {
 	UIButtonWithBorderOnHover btnOpen, btnClear;
-	UISeperator sp1, sp2;
+	UISeparator sp1, sp2;
 	std::vector<UIButtonWithBorderOnHoverWithFileInfo*> recentItems;
 	int itemHeight;
 	const File* selectedRecentFile;

@@ -1,15 +1,15 @@
-#include "UISeperator.h"
+#include "UISeparator.h"
 
-UISeperator::UISeperator() {
+UISeparator::UISeparator() {
 	set_line_colors(Color("#ccc"), Colors::white);
 }
 
-void UISeperator::set_line_colors(Color lineColor, Color shadowColor) {
+void UISeparator::set_line_colors(Color lineColor, Color shadowColor) {
 	this->lineColor.set(lineColor);
 	this->shadowColor.set(shadowColor);
 }
 
-void UISeperator::on_update() {
+void UISeparator::on_update() {
 	UILabel::on_update();
 
 	int y = area.height / 2, l, m, r;
