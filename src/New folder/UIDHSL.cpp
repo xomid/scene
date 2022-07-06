@@ -34,9 +34,9 @@ void UIDHSL::on_init() {
 	cLightness.set_gradient(gradient_func_black_white);
 
 	hue = saturation = lightness = 0;
-	cHue.config((double)hue, 1, -180, 180);
-	cSaturation.config((double)saturation, 1, -100, 100);
-	cLightness.config((double)lightness, 1, -100, 100);
+	cHue.config((double)hue, 1, -180, 180, 60);
+	cSaturation.config((double)saturation, 1, -100, 100, 60);
+	cLightness.config((double)lightness, 1, -100, 100, 60);
 
 	selPreset.set_title(L"Preset");
 	chkColorize.set_text(L"Colorize");
@@ -153,12 +153,12 @@ void UIDHSL::colorize() {
 	}*/
 
 	if (bColorize) {
-		cHue.config((double)hue, 1, -180, 180);
-		cSaturation.config((double)saturation, 1, -100, 100);
+		cHue.config((double)hue, 1, -180, 180, 60);
+		cSaturation.config((double)saturation, 1, -100, 100, 60);
 	}
 	else {
-		cHue.config((double)hue, 1, 0, 360);
-		cSaturation.config((double)saturation, 1, 0, 100);
+		cHue.config((double)hue, 1, 0, 360, 60);
+		cSaturation.config((double)saturation, 1, 0, 100, 60);
 	}
 
 	hue = (int)cHue.get_value();

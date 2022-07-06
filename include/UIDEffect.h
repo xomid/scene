@@ -36,5 +36,5 @@ public:
 	virtual void reset_image();
 	virtual void set_document(Document* document);
 	virtual void show(bool bShow = true);
-	virtual void render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom) = 0;
+	virtual int render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom) = 0;
 };

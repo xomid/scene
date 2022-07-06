@@ -4,11 +4,15 @@
 
 class UIComplexS : public OUI
 {
+protected:
 	UILinearSlide slide;
 	UINumber number;
 	UILabel label;
+	int numberFieldWidth;
+
 public:
-	void config(double value, double step, double minValue, double maxValue);
+	void config(double value, double step, double minValue, double maxValue, size_t numberFieldWidth);
+	void config(std::string value, std::string step, std::string minValue, std::string maxValue, size_t numberFieldWidth);
 	double get_value() const;
 
 	void set_gradient(GradientFunc gradientFunc);

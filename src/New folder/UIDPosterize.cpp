@@ -11,7 +11,7 @@ void UIDPosterize::on_init() {
 	cLevels.create(this);
 	cLevels.set_text(L"Levels");
 	threshold = 0;
-	cLevels.config((double)threshold, 1, 0, 255);
+	cLevels.config((double)threshold, 1, 0, 255, 60);
 }
 
 void UIDPosterize::on_resize(int width, int height) {
@@ -38,6 +38,6 @@ void UIDPosterize::process_event(OUI* element, uint32_t message, uint64_t param,
 
 void UIDPosterize::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	ImageEffect::posterize(srcImage, dstImage, threshold,
-		blockLeft, blockTop, blockRight, blockBottom);
+	/*ImageEffect::posterize(srcImage, dstImage, threshold,
+		blockLeft, blockTop, blockRight, blockBottom);*/
 }

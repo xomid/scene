@@ -103,6 +103,8 @@ void UIDEffect::wait_for_painting() {
 
 void UIDEffect::render_thread() {
 
+	bool isDone = false;
+
 	while (bRenderThreadRunning) {
 
 		using namespace std::chrono_literals;
@@ -123,13 +125,14 @@ void UIDEffect::render_thread() {
 				blockWidth = int(ceil((double)srcImage->w / (double)horizontalBlockCount));
 				blockHeight = int(ceil((double)srcImage->h / (double)verticalBlockCount));
 				blockTop = 0;
+				isDone = false;
 
-				for (verticalBlockIndex = 0; verticalBlockIndex < verticalBlockCount; ++verticalBlockIndex, blockTop += blockHeight) {
+				for (verticalBlockIndex = 0; verticalBlockIndex < verticalBlockCount && !isDone; ++verticalBlockIndex, blockTop += blockHeight) {
 					blockBottom = blockTop + blockHeight;
 					if (verticalBlockIndex == verticalBlockCount - 1)
 						blockBottom = srcImage->h;
 
-					for (horizontalBlockIndex = 0; horizontalBlockIndex < horizontalBlockCount; ++horizontalBlockIndex) {
+					for (horizontalBlockIndex = 0; horizontalBlockIndex < horizontalBlockCount && !isDone; ++horizontalBlockIndex) {
 
 						blockLeft = (int)horizontalBlockIndex * blockWidth;
 						blockRight = blockLeft + blockWidth;
@@ -141,18 +144,20 @@ void UIDEffect::render_thread() {
 						if (bInvalidate || bTerminate)
 							break;
 
-						render(srcImage, dstImage, blockLeft, blockTop, blockRight, blockBottom);
+						auto res = render(srcImage, dstImage, blockLeft, blockTop, blockRight, blockBottom);
+						if (res == 2) isDone = true;
+
 						bUpdateView = true;
 
 						if (bInvalidate || bTerminate)
 							break;
-
 					}
 
 					if (bInvalidate || bTerminate)
 						break;
-
 				}
+
+				if (isDone) bInvalidate = false;
 			}
 		}
 

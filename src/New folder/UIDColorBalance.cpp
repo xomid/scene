@@ -33,9 +33,9 @@ void UIDColorBalance::on_init() {
 	cBlue.set_text(L"Blue");
 
 	red = green = blue = 0;
-	cRed.config((double)red, 1, -100, 100);
-	cGreen.config((double)green, 1, -100, 100);
-	cBlue.config((double)blue, 1, -100, 100);
+	cRed.config((double)red, 1, -100, 100, 60);
+	cGreen.config((double)green, 1, -100, 100, 60);
+	cBlue.config((double)blue, 1, -100, 100, 60);
 
 	cRed.set_gradient(gradient_func_cyan_to_red);
 	cGreen.set_gradient(gradient_func_purple_to_green);

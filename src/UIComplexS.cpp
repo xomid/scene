@@ -1,10 +1,19 @@
 #include "UIComplexS.h"
 
-void UIComplexS::config(double value, double step, double minValue, double maxValue) {
+void UIComplexS::config(double value, double step, double minValue, double maxValue, size_t numberFieldWidth) {
 	slide.set_range(minValue, maxValue);
 	slide.set_value(value);
 	slide.set_step(step);
 	number.set_range(value, step, minValue, maxValue);
+	this->numberFieldWidth = (int)numberFieldWidth;
+}
+
+void UIComplexS::config(std::string value, std::string step, std::string minValue, std::string maxValue, size_t numberFieldWidth) {
+	slide.set_range(minValue, maxValue);
+	slide.set_value(value);
+	slide.set_step(step);
+	number.set_range(value, step, minValue, maxValue);
+	this->numberFieldWidth = (int)numberFieldWidth;
 }
 
 double UIComplexS::get_value() const {
@@ -26,15 +35,15 @@ void UIComplexS::on_init() {
 
 	number.border.set(1, backgroundColor.bright(-30));
 	label.canvas.art.alignX = Align::LEFT;
-	config(0, 1, 0, 1);
+	config(0, 1, 0, 1, 60);
 }
 
 void UIComplexS::on_resize(int width, int height) {
-	int l, t, labelW = 100, numW = 60, h = 24, bottomMargin = 5;
+	int l, t, labelW = 100, h = 24, bottomMargin = 5;
 	l = 0;
 	t = 0;
 	label.move(l, t, labelW, h);
-	number.move(contentArea.width - numW, t, numW, h);
+	number.move(contentArea.width - numberFieldWidth, t, numberFieldWidth, h);
 	t += h + bottomMargin;
 	h = 20;
 	slide.move(l, contentArea.height - h, contentArea.width, h);

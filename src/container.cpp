@@ -3,6 +3,8 @@
 #include "UIDOpenFile.h"
 #include "UIDSaveFile.h"
 
+UIDEffect* dlgEffect;
+
 void UIContainer::create_effect_windows() {
 	/*dlgProgress.create(300, 20, this);
 	dlgProgress.set_progress(0.);
@@ -25,12 +27,69 @@ void UIContainer::create_effect_windows() {
 	dlgHSL.set_document(&document);
 	dlgLevels.set_document(&document);
 	dlgPosterize.set_document(&document);
-	dlgThreshold.set_document(&document);*/
-
-	dlgThreshold.create(this);
 	dlgThreshold.set_document(&document);
+	
+	dlgAddNoise.create(this);
+	dlgBulge.create(this);
+	dlgCrystalize.create(this);
+	dlgDespeckle.create(this);
+	dlgGain.create(this);
+	dlgGlow.create(this);
+	dlgGussianBlur.create(this);
+	dlgMarble.create(this);
+	dlgMedian.create(this);
+	dlgMotionBlur.create(this);
+	dlgOldPaint.create(this);
+	dlgOutline.create(this);
+	dlgPencilSketch.create(this);
+	dlgPixelate.create(this);
+	dlgRadialBlur.create(this);
+	dlgRandomJitter.create(this);
+	dlgRipple.create(this);
+	dlgSmartBlur.create(this);
+	dlgSmear.create(this);
+	dlgSoftPortrait.create(this);
+	dlgStamp.create(this);
+	dlgSurfaceBlur.create(this);
+	dlgSwirl.create(this);
+	dlgTileGlass.create(this);
+	dlgWater.create(this);
+	dlgWave.create(this);
 
-	show_effect(&dlgThreshold);
+	dlgAddNoise.set_document(&doc);
+	dlgBulge.set_document(&doc);
+	dlgCrystalize.set_document(&doc);
+	dlgDespeckle.set_document(&doc);
+	dlgGain.set_document(&doc);
+	dlgGlow.set_document(&doc);
+	dlgGussianBlur.set_document(&doc);
+	dlgMarble.set_document(&doc);
+	dlgMedian.set_document(&doc);
+	dlgMotionBlur.set_document(&doc);
+	dlgOldPaint.set_document(&doc);
+	dlgOutline.set_document(&doc);
+	dlgPencilSketch.set_document(&doc);
+	dlgPixelate.set_document(&doc);
+	dlgRadialBlur.set_document(&doc);
+	dlgRandomJitter.set_document(&doc);
+	dlgRipple.set_document(&doc);
+	dlgSmartBlur.set_document(&doc);
+	dlgSmear.set_document(&doc);
+	dlgSoftPortrait.set_document(&doc);
+	dlgStamp.set_document(&doc);
+	dlgSurfaceBlur.set_document(&doc);
+	dlgSwirl.set_document(&doc);
+	dlgTileGlass.set_document(&doc);
+	dlgWater.set_document(&doc);
+	dlgWave.set_document(&doc);
+	
+	*/
+
+	dlgEffect = new UIDCrystalize();
+
+	dlgEffect->create(this);
+	dlgEffect->set_document(&document);
+	show_effect(dlgEffect);
 
 	//uix->show_box_model();
 }
@@ -88,7 +147,7 @@ void UIContainer::on_init()
 
 void UIContainer::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 
-	if (element == &dlgContBright) {
+	if (element == dlgEffect) {
 		if (message == Event::Click) {
 			mainView.show_frame(param);
 		}
@@ -143,7 +202,7 @@ void UIContainer::process_event(OUI* element, uint32_t message, uint64_t param, 
 		save(filePath);
 	}
 	else if (message == UISIDE_CLOSE_DOCUMENT) {
-		dlgContBright.show();
+		dlgEffect->show();
 
 		//if (document.is_invalidated())
 		//	dlgCloseWithoutSave.show_window();
@@ -173,7 +232,7 @@ void UIContainer::process_event(OUI* element, uint32_t message, uint64_t param, 
 				sideView.mZoom->set_zoom_info(zInfo);
 			}
 		}
-		else if (message == UIHISTO_UPDATE) {
+		else if (message == UIHISTO_UPDATE && !bApplyThreadRunning) {
 			auto low = param & 15;
 			auto high = param >> 4;
 			if (low == 1) document.undo();
@@ -218,14 +277,16 @@ void UIContainer::load(std::wstring filePath) {
 }
 
 void UIContainer::update_image_dependant_elements() {
-	dlgContBright.reset_image();
+	if (dlgEffect) dlgEffect->reset_image();
+
+	/*dlgContBright.reset_image();
 	dlgChannelMixer.reset_image();
 	dlgColorBalance.reset_image();
 	dlgCurves.reset_image();
 	dlgHSL.reset_image();
 	dlgLevels.reset_image();
 	dlgPosterize.reset_image();
-	dlgThreshold.reset_image();
+	dlgThreshold.reset_image();*/
 }
 
 void UIContainer::save(std::wstring filePath) {
@@ -315,12 +376,16 @@ void UIContainer::apply_thread() {
 	blockLeft = 0;
 	blockRight = srcImage->w;
 	auto progressBlockCount1 = progressBlockCount - 1;
+	bool isDone = false;
 
-	for (verticalBlockIndex = 0; verticalBlockIndex < progressBlockCount; ++verticalBlockIndex, blockTop += blockHeight) {
+	for (verticalBlockIndex = 0; verticalBlockIndex < progressBlockCount && !isDone; ++verticalBlockIndex, blockTop += blockHeight) {
 		blockBottom = blockTop + blockHeight;
 		if (verticalBlockIndex == progressBlockCount1)
 			blockBottom = srcImage->h;
-		currEffectDlg->render(srcImage, dstImage, blockLeft, blockTop, blockRight, blockBottom);
+
+		auto res = currEffectDlg->render(srcImage, dstImage, blockLeft, blockTop, blockRight, blockBottom);
+		if (res == 2) isDone = true;
+		
 		progress = (double)verticalBlockIndex / (double)(progressBlockCount1);
 		bUpdateProgress = true;
 	}

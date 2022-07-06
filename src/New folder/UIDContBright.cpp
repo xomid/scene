@@ -13,11 +13,11 @@ void UIDContBright::on_init() {
 
 	scBright.set_text(L"Brightness");
 	brightness = 0;
-	scBright.config((int)brightness, 1, -150, 150);
+	scBright.config((int)brightness, 1, -150, 150, 60);
 
 	scContst.set_text(L"Contrast");
 	contrast = 0;
-	scContst.config((int)contrast, 1, -100, 100);
+	scContst.config((int)contrast, 1, -100, 100, 60);
 
 	chkLegacy.set_text(L"Legacy");
 	chkLegacy.select(bLegacy = true);
@@ -54,12 +54,12 @@ void UIDContBright::process_event(OUI* element, uint32_t message, uint64_t param
 			chkLegacy.select(message == Event::Select);
 			bLegacy = chkLegacy.bSelected;
 			if (bLegacy) {
-				scBright.config(scBright.get_value(), 1, -100, 100);
-				scContst.config(scContst.get_value(), 1, -100, 100);
+				scBright.config(scBright.get_value(), 1, -100, 100, 60);
+				scContst.config(scContst.get_value(), 1, -100, 100, 60);
 			}
 			else {
-				scBright.config(scBright.get_value(), 1, -150, 150);
-				scContst.config(scContst.get_value(), 1, -50, 100);
+				scBright.config(scBright.get_value(), 1, -150, 150, 60);
+				scContst.config(scContst.get_value(), 1, -50, 100, 60);
 			}
 
 			bInvalidate = bLegacy != prevState;

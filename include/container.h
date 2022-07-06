@@ -16,6 +16,32 @@
 #include "UIDLevels.h"
 #include "UIDPosterize.h"
 #include "UIDThreshold.h"
+#include "UIDAddNoise.h"
+#include "UIDBulge.h"
+#include "UIDCrystalize.h"
+#include "UIDDespeckle.h"
+#include "UIDGain.h"
+#include "UIDGlow.h"
+#include "UIDGussianBlur.h"
+#include "UIDMarble.h"
+#include "UIDMedian.h"
+#include "UIDMotionBlur.h"
+#include "UIDOldPaint.h"
+#include "UIDOutline.h"
+#include "UIDPencilSketch.h"
+#include "UIDPixelate.h"
+#include "UIDRadialBlur.h"
+#include "UIDRandomJitter.h"
+#include "UIDRipple.h"
+#include "UIDSmartBlur.h"
+#include "UIDSmear.h"
+#include "UIDSoftPortrait.h"
+#include "UIDStamp.h"
+#include "UIDSurfaceBlur.h"
+#include "UIDSwirl.h"
+#include "UIDTileGlass.h"
+#include "UIDWater.h"
+#include "UIDWave.h"
 
 
 class UIContainer : public OUI
@@ -26,6 +52,35 @@ class UIContainer : public OUI
 	Document document;
 	UIDialog dlgCloseWithoutSave;
 	UIDProgress dlgProgress;
+
+	/*
+	UIDAddNoise dlgAddNoise;
+	UIDBulge dlgBulge;
+	UIDCrystalize dlgCrystalize;
+	UIDDespeckle dlgDespeckle;
+	UIDGain dlgGain;
+	UIDGlow dlgGlow;
+	UIDGussianBlur dlgGussianBlur;
+	UIDMarble dlgMarble;
+	UIDMedian dlgMedian;
+	UIDMotionBlur dlgMotionBlur;
+	UIDOldPaint dlgOldPaint;
+	UIDOutline dlgOutline;
+	UIDPencilSketch dlgPencilSketch;
+	UIDPixelate dlgPixelate;
+	UIDRadialBlur dlgRadialBlur;
+	UIDRandomJitter dlgRandomJitter;
+	UIDRipple dlgRipple;
+	UIDSmartBlur dlgSmartBlur;
+	UIDSmear dlgSmear;
+	UIDSoftPortrait dlgSoftPortrait;
+	UIDStamp dlgStamp;
+	UIDSurfaceBlur dlgSurfaceBlur;
+	UIDSwirl dlgSwirl;
+	UIDTileGlass dlgTileGlass;
+	UIDWater dlgWater;
+	UIDWave dlgWave;
+	
 	UIDContBright dlgContBright;
 	UIDChannelMixer dlgChannelMixer;
 	UIDColorBalance dlgColorBalance;
@@ -33,7 +88,8 @@ class UIContainer : public OUI
 	UIDHSL dlgHSL;
 	UIDLevels dlgLevels;
 	UIDPosterize dlgPosterize;
-	UIDThreshold dlgThreshold;
+	UIDThreshold dlgThreshold;*/
+
 	UIDEffect* currEffectDlg;
 
 	std::vector<FileDialogFileType> fileTypes;

@@ -65,9 +65,9 @@ void UIDChannelMixer::on_init() {
 	cBlue.set_gradient(gradient_func_black_blue_white);
 
 	red = green = blue = 0;
-	cRed.config((double)red, 1, -200, 200);
-	cGreen.config((double)green, 1, -200, 200);
-	cBlue.config((double)blue, 1, -200, 200);
+	cRed.config((double)red, 1, -200, 200, 60);
+	cGreen.config((double)green, 1, -200, 200, 60);
+	cBlue.config((double)blue, 1, -200, 200, 60);
 
 	chkMono.set_text(L"Monochrome");
 	chkPreserveLum.set_text(L"Preserve Luminosity");
@@ -180,6 +180,6 @@ void UIDChannelMixer::process_event(OUI* element, uint32_t message, uint64_t par
 
 void UIDChannelMixer::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	ImageEffect::channel_mixer(srcImage, dstImage, &blob, bMono, bPreserveLum, red, green, blue,
-		blockLeft, blockTop, blockRight, blockBottom);
+	/*ImageEffect::channel_mixer(srcImage, dstImage, &blob, bMono, bPreserveLum, red, green, blue,
+		blockLeft, blockTop, blockRight, blockBottom);*/
 }

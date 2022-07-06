@@ -16,7 +16,7 @@ void UIDThreshold::on_init() {
 	cLevels.create(this);
 	chkMono.create(this);
 	threshold = 128;
-	cLevels.config((double)threshold, 1, 0, 255);
+	cLevels.config((double)threshold, 1, 0, 255, 60);
 	chkMono.set_text(L"Monochrome");
 	chkMono.select(bMono = true);
 }
