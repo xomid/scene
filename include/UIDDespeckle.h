@@ -5,7 +5,7 @@
 class UIDDespeckle : public UIDEffect
 {
 	UIComplexS cIteration;
-	int iteration;
+	size_t iteration;
 
 public:
 	void measure_size(int* width, int* height) override;

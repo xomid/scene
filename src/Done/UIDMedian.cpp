@@ -6,6 +6,11 @@ void UIDMedian::measure_size(int* width, int* height) {
 	if (height) *height = 170;
 }
 
+void UIDMedian::on_destroy() {
+	if (blob) delete blob;
+	blob = NULL;
+}
+
 void UIDMedian::on_init() {
 	set_title(L"Median");
 	cRadius.create(this);
@@ -16,6 +21,8 @@ void UIDMedian::on_init() {
 	percentile = 0;
 	cRadius.config(radius, 1., 1, 200., 60);
 	cPercentile.config(percentile, 1., 0, 100., 60);
+
+	blob = new MedianBlob();
 }
 
 void UIDMedian::on_resize(int width, int height) {
@@ -33,11 +40,11 @@ void UIDMedian::on_resize(int width, int height) {
 
 void UIDMedian::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cRadius) {
-		radius = cRadius.get_value();
+		radius = (size_t)cRadius.get_value();
 		bInvalidate = true;
 	}
 	else if (element == &cPercentile) {
-		percentile = cPercentile.get_value();
+		percentile = (size_t)cPercentile.get_value();
 		bInvalidate = true;
 	}
 	else {
@@ -45,8 +52,8 @@ void UIDMedian::process_event(OUI* element, uint32_t message, uint64_t param, bo
 	}
 }
 
-void UIDMedian::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDMedian::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, radius,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::median(srcImage, dstImage, blob, radius, percentile,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

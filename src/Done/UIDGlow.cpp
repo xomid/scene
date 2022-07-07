@@ -6,6 +6,11 @@ void UIDGlow::measure_size(int* width, int* height) {
 	if (height) *height = 230;
 }
 
+void UIDGlow::on_destroy() {
+	if (blob) delete blob;
+	blob = NULL;
+}
+
 void UIDGlow::on_init() {
 	set_title(L"Glow");
 	cSoftness.create(this);
@@ -20,6 +25,8 @@ void UIDGlow::on_init() {
 	cSoftness.config(1., 1., 1., 16., 60);
 	cBrightness.config(0., 1., -100., 100., 60);
 	cContrast.config(0., 1., -100., 100., 60);
+
+	blob = new GlowBlob();
 }
 
 void UIDGlow::on_resize(int width, int height) {
@@ -54,8 +61,8 @@ void UIDGlow::process_event(OUI* element, uint32_t message, uint64_t param, bool
 	}
 }
 
-void UIDGlow::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDGlow::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, gain,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::glow(srcImage, dstImage, blob, softness, brightness, contrast,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

@@ -85,7 +85,7 @@ void UIContainer::create_effect_windows() {
 	
 	*/
 
-	dlgEffect = new UIDCrystalize();
+	dlgEffect = new UIDMedian();
 
 	dlgEffect->create(this);
 	dlgEffect->set_document(&document);
@@ -99,6 +99,7 @@ void UIContainer::show_effect(UIDEffect* dlgEffect) {
 		currEffectDlg = dlgEffect;
 		dlgProgress.set_title(dlgEffect->title);
 		dlgProgress.move(0, 0);
+		mainView.show_frame();
 		dlgEffect->show();
 	}
 }
@@ -318,11 +319,12 @@ void UIContainer::on_window_closed(UIWindow* window, size_t wmsg) {
 			std::thread thread(&UIContainer::apply_thread, this);
 			thread.detach();
 			tempImage.free();
-			set_timer(1, 100);
+			set_timer(1, 10);
 		}
 		else if (wmsg == DialogButtonId::Cancel) {
 			document.reset_frame();
 		}
+		mainView.show_frame();
 	}
 }
 
@@ -336,6 +338,10 @@ void UIContainer::on_timer(uint32_t nTimer) {
 		bCopyResult = false;
 		kill_timer(1);
 		copy_result();
+	}
+
+	if (bApplyThreadRunning == false) {
+		kill_timer(1);
 	}
 }
 
@@ -376,20 +382,23 @@ void UIContainer::apply_thread() {
 	blockLeft = 0;
 	blockRight = srcImage->w;
 	auto progressBlockCount1 = progressBlockCount - 1;
-	bool isDone = false;
+	bool wasSuccessful = true;
 
-	for (verticalBlockIndex = 0; verticalBlockIndex < progressBlockCount && !isDone; ++verticalBlockIndex, blockTop += blockHeight) {
+	for (verticalBlockIndex = 0; verticalBlockIndex < progressBlockCount; ++verticalBlockIndex, blockTop += blockHeight) {
 		blockBottom = blockTop + blockHeight;
 		if (verticalBlockIndex == progressBlockCount1)
 			blockBottom = srcImage->h;
 
 		auto res = currEffectDlg->render(srcImage, dstImage, blockLeft, blockTop, blockRight, blockBottom);
-		if (res == 2) isDone = true;
+		if (res != IMAGE_EFFECT_RESULT_OK) {
+			if (res == IMAGE_EFFECT_RESULT_ERROR) wasSuccessful = false;
+			break;
+		}
 		
 		progress = (double)verticalBlockIndex / (double)(progressBlockCount1);
 		bUpdateProgress = true;
 	}
 
-	bCopyResult = true;
+	bCopyResult = wasSuccessful;
 	bApplyThreadRunning = false;
 }

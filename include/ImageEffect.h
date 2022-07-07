@@ -3,6 +3,12 @@
 #include "BrightnessData.h"
 #include "ContrastData.h"
 
+#define IMAGE_EFFECT_RESULT_OK 0
+#define IMAGE_EFFECT_RESULT_ERROR 1
+#define IMAGE_EFFECT_RESULT_WHOLE_IMAGE 2
+
+bool are_not_equal(double a, double b);
+
 enum class ColorChannel {
 	None,
 	RGB,
@@ -46,7 +52,7 @@ struct RGBLookup {
 
 
 struct ImageEffectBlob {
-	bool bSet;
+	bool isSet;
 public:
 	ImageEffectBlob();
 };
@@ -115,7 +121,23 @@ public:
 	int init(byte threshold);
 };
 
+struct GlowBlob : public GrayLookup, public ImageEffectBlob {
+private:
+	int softness, brightness, contrast;
+public:
+	int weights[2001];
+	byte localStore[192096], stack[99];
+	int init(int& softness, int& brightness, int& contrast);
+};
 
+
+struct MedianBlob : public GrayLookup, public ImageEffectBlob {
+private:
+	size_t radius, percentile;
+public:
+	int leadingEdgeX[256], ha[256], hr[256], hg[256], hb[256];
+	int init(size_t& radius, size_t& percentile);
+};
 
 
 
@@ -123,6 +145,7 @@ public:
 
 
 struct GainBlob : public GrayLookup, public ImageEffectBlob {
+	double gain, bias;
 public:
 	int init(double gain, double bias);
 };
@@ -243,7 +266,7 @@ public:
 
 	// softness [1, 16]
 	// contrast, brightness [-100, 100]
-	static int glow(Sheet* srcImage, Sheet* dstImage, int softness, int brightness, int contrast,
+	static int glow(Sheet* srcImage, Sheet* dstImage, GlowBlob* blob, int softness, int brightness, int contrast,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// telorance, scale [0, 100]
@@ -255,7 +278,7 @@ public:
 
 	// radius [1, 200]
 	// percentile [0, 100]
-	static int median(Sheet* srcImage, Sheet* dstImage, size_t radius, size_t percentile,
+	static int median(Sheet* srcImage, Sheet* dstImage, MedianBlob* blob, size_t radius, size_t percentile,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	static int minimum(Sheet* srcImage, Sheet* dstImage,

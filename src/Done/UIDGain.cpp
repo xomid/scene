@@ -45,8 +45,8 @@ void UIDGain::process_event(OUI* element, uint32_t message, uint64_t param, bool
 	}
 }
 
-void UIDGain::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDGain::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, gain,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::gain(srcImage, dstImage, &blob, gain, bias,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

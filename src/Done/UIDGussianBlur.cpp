@@ -11,7 +11,7 @@ void UIDGussianBlur::on_init() {
 	cRadius.create(this);
 	cRadius.set_text(L"Radius");
 	radius = 0;
-	cRadius.config((double)radius, 0., 0., 254., 60);
+	cRadius.config((double)radius, 1., 0., 254., 60);
 }
 
 void UIDGussianBlur::on_resize(int width, int height) {
@@ -28,7 +28,7 @@ void UIDGussianBlur::on_resize(int width, int height) {
 
 void UIDGussianBlur::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cRadius) {
-		radius = cRadius.get_value();
+		radius = (size_t)cRadius.get_value();
 		bInvalidate = true;
 	}
 	else {
@@ -36,8 +36,8 @@ void UIDGussianBlur::process_event(OUI* element, uint32_t message, uint64_t para
 	}
 }
 
-void UIDGussianBlur::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDGussianBlur::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, gain,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::gussian_blur(srcImage, dstImage, radius,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

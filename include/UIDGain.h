@@ -6,6 +6,7 @@ class UIDGain : public UIDEffect
 {
 	UIComplexS cGain, cBias;
 	double gain, bias;
+	GainBlob blob;
 
 public:
 	void measure_size(int* width, int* height) override;

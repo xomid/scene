@@ -80,16 +80,19 @@ void UIDEffect::show(bool bShow) {
 	if (bShow == false) {
 		cancel();
 	}
-	else if (!bRenderThreadRunning) {
-		bRenderThreadRunning = true;
-		bTerminate = false;
-		bInvalidate = true;
-		std::thread thread(&UIDEffect::render_thread, this);
-		thread.detach();
-	}
 	else {
-		bTerminate = false;
-		bInvalidate = true;
+		chkPreview.select(true);
+		if (!bRenderThreadRunning) {
+			bRenderThreadRunning = true;
+			bTerminate = false;
+			bInvalidate = true;
+			std::thread thread(&UIDEffect::render_thread, this);
+			thread.detach();
+		}
+		else {
+			bTerminate = false;
+			bInvalidate = true;
+		}
 	}
 
 	set_timer(0, 100);
@@ -116,7 +119,7 @@ void UIDEffect::render_thread() {
 				auto srcImage = document->get_image();
 				auto dstImage = document->get_frame();
 
-				if (srcImage == NULL || dstImage == NULL) 
+				if (srcImage == NULL || dstImage == NULL)
 					return;
 
 				size_t verticalBlockIndex, horizontalBlockIndex;
@@ -145,7 +148,11 @@ void UIDEffect::render_thread() {
 							break;
 
 						auto res = render(srcImage, dstImage, blockLeft, blockTop, blockRight, blockBottom);
-						if (res == 2) isDone = true;
+						if (res == IMAGE_EFFECT_RESULT_ERROR || res == IMAGE_EFFECT_RESULT_WHOLE_IMAGE) {
+							isDone = true;
+							if (res == IMAGE_EFFECT_RESULT_ERROR)
+								bRenderThreadRunning = false;
+						}
 
 						bUpdateView = true;
 

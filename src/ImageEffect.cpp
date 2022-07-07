@@ -25,31 +25,6 @@ blockTop = CLAMP3(0, blockTop, h - 1);\
 blockBottom = CLAMP3(0, blockBottom, h);
 
 
-ImageEffectBlob::ImageEffectBlob() : bSet(false) {
-}
-
-int AutoContrastBlob::init() {
-	if (bSet) return 0;
-
-	bSet = true;
-	for (int i = 0; i < 256; i++)
-	{
-		byte val = i;
-
-		if (val >= 100 && val <= 235) val += 20;
-		else if (val > 235) val = 255;
-		else if (val <= 40 && val >= 20) val -= 20;
-		else if (val < 20) val = 0;
-		else if (val > 70 && val < 100) val += 10;
-		else if (val < 60 && val > 40) val -= 10;
-
-		gray[i] = val;
-	}
-
-	return 0;
-}
-
-
 int ImageEffect::channel_mixer(Sheet* srcImage, Sheet* dstImage, ChannelMixerBlob* blob, bool bMono, bool bPreserveLuminosity,
 	ChannelMixInfo red, ChannelMixInfo green, ChannelMixInfo blue, int blockLeft, int blockTop, int blockRight, int blockBottom) {
 	return 0;

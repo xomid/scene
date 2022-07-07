@@ -5,7 +5,7 @@
 class UIDGussianBlur : public UIDEffect
 {
 	UIComplexS cRadius;
-	int radius;
+	size_t radius;
 
 public:
 	void measure_size(int* width, int* height) override;
