@@ -88,8 +88,8 @@ void UIDColorBalance::process_event(OUI* element, uint32_t message, uint64_t par
 	}
 }
 
-void UIDColorBalance::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDColorBalance::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	ImageEffect::color_balance(srcImage, dstImage, &blob, bPreserveLum, red, green, blue,
+	return ImageEffect::color_balance(srcImage, dstImage, bPreserveLum, red, green, blue,
 		blockLeft, blockTop, blockRight, blockBottom);
 }

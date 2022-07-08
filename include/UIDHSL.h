@@ -8,8 +8,14 @@ class UIDHSL : public UIDEffect
 	UISelect<UISelectDefaultMenu> selPreset;
 	UIComplexS cHue, cSaturation, cLightness;
 	UICheck chkColorize;
-	bool bColorize;
-	int hue, saturation, lightness;
+	bool shouldColorize;
+
+	struct HSL {
+		int hue, saturation, lightness;
+		void reset();
+	};
+
+	HSL hsl, colorizeHsl, normalHsl;
 	HSLBlob blob;
 
 public:

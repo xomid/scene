@@ -5,6 +5,85 @@
 ImageEffectBlob::ImageEffectBlob() : isSet(false) {
 }
 
+void ChannelMixInfo::reset() {
+	red = 0.;
+	green = 0.;
+	blue = 0.;
+}
+
+void ChannelMixInfo::set(double red, double green, double blue) {
+	this->red = red;
+	this->green = green;
+	this->blue = blue;
+}
+
+bool ChannelMixInfo::operator!=(const ChannelMixInfo& obj) {
+	return this->red != obj.red || this->green != obj.green || this->blue != obj.blue;
+}
+
+bool ChannelLevelInfo::operator!=(const ChannelLevelInfo& obj) {
+	return this->outputMin != obj.outputMin || this->outputMax != obj.outputMax ||
+		this->minRange != obj.minRange || are_not_equal(this->gamma, obj.gamma) || this->maxRange != obj.maxRange;
+}
+
+int LevelsBlob::init(ChannelLevelInfo& rgbInfo, ChannelLevelInfo& redInfo, ChannelLevelInfo& greenInfo, ChannelLevelInfo& blueInfo) {
+
+	if (!isSet ||
+		this->rgbInfo != rgbInfo || this->redInfo != redInfo ||
+		this->greenInfo != greenInfo || this->blueInfo != blueInfo)
+	{
+		int i, n, val;
+		int rlin, glin, blin, vlin;
+		double rse, gse, bse, vse;
+
+		vlin = rgbInfo.outputMin;
+		rlin = redInfo.outputMin;
+		glin = greenInfo.outputMin;
+		blin = blueInfo.outputMin;
+
+		vse = (rgbInfo.outputMax - vlin) / 255.0;
+		rse = (redInfo.outputMax - rlin) / 255.0;
+		gse = (greenInfo.outputMax - glin) / 255.0;
+		bse = (blueInfo.outputMax - blin) / 255.0;
+
+		int e, k;
+		double range;
+
+		e = rgbInfo.maxRange + 1;
+		range = rgbInfo.maxRange - rgbInfo.minRange;
+		auto vlookup = rgbInfo.lookup;
+
+		for (i = 0; i < rgbInfo.minRange; i++)
+			vlookup[i] = 0;
+		for (i = e; i < 256; i++)
+			vlookup[i] = 255;
+
+		for (i = rgbInfo.minRange; i < e; i++)
+			vlookup[i] = 255 * ((i - rgbInfo.minRange) / range);
+
+		for (i = 0; i < 256; i++)
+		{
+			vslookup[i] = CLAMP255(i * vse + vlin);
+			bslookup[i] = CLAMP255(i * bse + blin);
+			gslookup[i] = CLAMP255(i * gse + glin);
+			rslookup[i] = CLAMP255(i * rse + rlin);
+		}
+
+		redInfo.fill_lookup(&rgbInfo);
+		greenInfo.fill_lookup(&rgbInfo);
+		blueInfo.fill_lookup(&rgbInfo);
+
+		isSet = true;
+		this->rgbInfo = rgbInfo;
+		this->redInfo = redInfo;
+		this->greenInfo = greenInfo;
+		this->blueInfo = blueInfo;
+	}
+
+	return IMAGE_EFFECT_RESULT_OK;
+}
+
+
 int AutoContrastBlob::init() {
 	if (!isSet) {
 		isSet = true;
@@ -47,7 +126,7 @@ int SmartBlurBlob::init(size_t& radius, size_t& threshold) {
 
 		index = 0;
 		ra = (int)ceil(radius);
-		rows = ra * 2 + 1; 
+		rows = ra * 2 + 1;
 		sigma = radius / 3.;
 		sigma22 = 2 * sigma * sigma;
 		sigmaPi2 = 2 * PI * sigma;
@@ -82,7 +161,7 @@ int StampBlob::init(size_t& radius, double& threshold) {
 	if (!isSet || this->radius != radius || are_not_equal(this->threshold, threshold)) {
 		int r = radius;
 		int i, size = 1 + (r * 2);
-		
+
 		for (i = 0; i <= r; ++i) {
 			weights[i] = 16 * (i + 1);
 			weights[size - i - 1] = weights[i];
@@ -103,7 +182,7 @@ int SoftPortraitBlob::init(size_t& softness, size_t& warmness, int& brightness) 
 
 	if (!isSet || this->softness != softness || this->warmness != warmness || this->brightness != brightness) {
 		int i, r, size;
-		
+
 		r = softness;
 		size = 1 + (r * 2);
 
@@ -519,7 +598,7 @@ int ThresholdBlob::init(byte threshold, bool isMonochromatic) {
 			for (i = threshold; i < 256; i++)
 				gray[i] = 255;
 		}
-		else for (i = 0; i < 256; i++) 
+		else for (i = 0; i < 256; i++)
 			gray[i] = i < threshold ? 255 - i : i;
 
 		isSet = true;

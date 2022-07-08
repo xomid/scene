@@ -50,6 +50,7 @@ struct RGBLookup {
 	unsigned char red[256], green[256], blue[256];
 };
 
+typedef RGBGrayLookup CurvesBlob;
 
 struct ImageEffectBlob {
 	bool isSet;
@@ -76,15 +77,29 @@ public:
 };
 
 struct ChannelMixInfo {
-	// red, green, blue [-200, 200]
-	int red, green, blue;
+public:
+	// red, green, blue [-2, 2]
+	double red, green, blue;
+	void reset();
+	void set(double red, double green, double blue);
+	bool operator!=(const ChannelMixInfo& obj);
 };
 
-struct ChannelMixerBlob : public ImageEffectBlob {
+struct ChannelLevelInfo {
 public:
-	unsigned char rlookup[256], glookup[256], blookup[256];
-	bool bMono, bPreserveLum;
+	double gamma;
+	byte minRange, maxRange, outputMin, outputMax, lookup[256];
+	bool operator!=(const ChannelLevelInfo& obj);
+	void fill_lookup(ChannelLevelInfo* rgbInfo);
 };
+
+struct LevelsBlob : public ImageEffectBlob {
+	ChannelLevelInfo rgbInfo, redInfo, greenInfo, blueInfo;
+public:
+	byte vslookup[256], rslookup[256], gslookup[256], bslookup[256];
+	int init(ChannelLevelInfo& rgbInfo, ChannelLevelInfo& redInfo, ChannelLevelInfo& greenInfo, ChannelLevelInfo& blueInfo);
+};
+
 
 struct ColorBalanceBlob : public ImageEffectBlob {
 public:
@@ -92,26 +107,16 @@ public:
 	bool bPreserveLum;
 };
 
-struct CurvesBlob : public ImageEffectBlob {
+struct HSLBlob : public RGBLookup, public ImageEffectBlob {
+private:
+	bool shouldColorize;
+	int _hue, _saturation, _lightness;
 public:
-	unsigned char vlookup[256], rlookup[256], glookup[256], blookup[256];
+	byte finalRedLookup[256], finalGreenLookup[256], finalBlueLookup[256];
+	int hue, saturation, lightness;
+	int init(bool shouldColorize, int& hue, int& saturation, int& lightness);
 };
 
-struct HSLBlob : public ImageEffectBlob {
-public:
-	unsigned char rlookup[256], glookup[256], blookup[256];
-};
-
-struct ChannelLevelInfo {
-	byte minRange, maxRange;
-	double gamma;
-	byte outputMin, outputMax;
-};
-
-struct LevelsBlob : public ImageEffectBlob {
-public:
-	unsigned char rlookup[256], glookup[256], blookup[256];
-};
 
 struct PosterizeBlob : public GrayLookup, public ImageEffectBlob {
 	byte threshold;
@@ -197,12 +202,10 @@ public:
 	int init(double& telorance, double& scale);
 };
 
-
 struct OldPaintBlob : public ImageEffectBlob {
 public:
 	int localStore[20480];
 };
-
 
 struct PencilSketchBlob : public GrayLookup, public ImageEffectBlob {
 private:
@@ -294,11 +297,13 @@ public:
 		int brightness, int contrast, int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// for each channel, red, green, blue [-200, 200]
-	static int channel_mixer(Sheet* srcImage, Sheet* dstImage, ChannelMixerBlob* blob, bool isMonochromatic, bool shouldPreserveLuminosity,
-		ChannelMixInfo red, ChannelMixInfo green, ChannelMixInfo blue, int blockLeft, int blockTop, int blockRight, int blockBottom);
+	static int channel_mixer(Sheet* srcImage, Sheet* dstImage,
+		ChannelMixInfo& gray, ChannelMixInfo& red, ChannelMixInfo& green, ChannelMixInfo& blue,
+		bool isMonochromatic, bool shouldPreserveLuminosity,
+		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// red, green, blue [-100, 100]
-	static int color_balance(Sheet* srcImage, Sheet* dstImage, ColorBalanceBlob* blob, bool shouldPreserveLuminosity,
+	static int color_balance(Sheet* srcImage, Sheet* dstImage, bool shouldPreserveLuminosity,
 		int red, int green, int blue, int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	static int curves(Sheet* srcImage, Sheet* dstImage, CurvesBlob* blob,
@@ -317,8 +322,8 @@ public:
 	static int hsl(Sheet* srcImage, Sheet* dstImage, HSLBlob* blob, bool shouldColorize, int hue, int saturation, int lightness,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
-	static int levels(Sheet* srcImage, Sheet* dstImage, LevelsBlob* blob, 
-		ChannelLevelInfo rgbInfo, ChannelLevelInfo redInfo, ChannelLevelInfo, ChannelLevelInfo blueInfo,
+	static int levels(Sheet* srcImage, Sheet* dstImage, LevelsBlob* blob,
+		ChannelLevelInfo& rgbInfo, ChannelLevelInfo& redInfo, ChannelLevelInfo& greenInfo, ChannelLevelInfo& blueInfo,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	static int negative(Sheet* srcImage, Sheet* dstImage,
@@ -335,13 +340,13 @@ public:
 	// filter effects
 	// these effects may change the whole structure and color of pixels
 	// as opposed to what adjustment effects do
-	
-	
+
+
 	// amount [0.1, 400]
 	static int add_noise(Sheet* srcImage, Sheet* dstImage, NoiseType noiseType, double amount,
 		bool isMonochromatic, int blockLeft, int blockTop, int blockRight, int blockBottom);
 
-	static int blur(Sheet* srcImage, Sheet* dstImage, 
+	static int blur(Sheet* srcImage, Sheet* dstImage,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// amount [-2, 1]
@@ -355,7 +360,7 @@ public:
 	// edgeThickness, randomness [0, 1]
 	// distancePower [0.01, 10]
 	// scale [0.01, 256]
-	static int crystalize(Sheet* srcImage, Sheet* dstImage, CrystalizeBlob* crystalizeBlob, 
+	static int crystalize(Sheet* srcImage, Sheet* dstImage, CrystalizeBlob* crystalizeBlob,
 		CrystalizeMode crystalizeMode, bool shouldFadeEdges,
 		double edgeThickness, double randomness, double distancePower, double scale,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);

@@ -8,11 +8,13 @@ class UIDChannelMixer : public UIDEffect
 	UISelect<UISelectDefaultMenu> selPreset, selOutChannel;
 	UIComplexP cRed, cGreen, cBlue;
 	UICheck chkMono, chkPreserveLum;
-	bool bMono, bPreserveLum;
-	int red, green, blue;
-	ChannelMixerBlob blob;
+	bool isMonochromatic, shouldPreserveLum;
+	ChannelMixInfo gray, red, green, blue;
 
+	ChannelMixInfo* get_channel_info(bool isMonochromatic, size_t index);
 	void reset_output_channel_menu();
+	void load_preset(size_t index);
+
 public:
 	void measure_size(int* width, int* height) override;
 	void on_init() override;

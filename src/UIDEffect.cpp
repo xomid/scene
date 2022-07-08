@@ -25,6 +25,7 @@ void UIDEffect::create(OUI* caller) {
 	bViewUpdated = false;
 	bTerminate = false;
 	bRenderThreadRunning = false;
+	bCompleteRendering = false;
 
 	chkPreview.select(bPreview = true);
 
@@ -70,7 +71,12 @@ void UIDEffect::close(uint32_t wmsg) {
 		cancel();
 	}
 	else {
-		stop_render_thread();
+		int y = 0;
+		bCompleteRendering = true;
+		while (bCompleteRendering) {
+			bUpdateView = false;
+			++y;
+		}
 	}
 
 	UIDialog::close(wmsg);
@@ -84,12 +90,14 @@ void UIDEffect::show(bool bShow) {
 		chkPreview.select(true);
 		if (!bRenderThreadRunning) {
 			bRenderThreadRunning = true;
+			bCompleteRendering = false;
 			bTerminate = false;
 			bInvalidate = true;
 			std::thread thread(&UIDEffect::render_thread, this);
 			thread.detach();
 		}
 		else {
+			bCompleteRendering = false;
 			bTerminate = false;
 			bInvalidate = true;
 		}
@@ -170,6 +178,11 @@ void UIDEffect::render_thread() {
 
 		if (bTerminate)
 			break;
+
+		if (bCompleteRendering && !bInvalidate) {
+			bCompleteRendering = false;
+			break;
+		}
 	}
 
 	bRenderThreadRunning = false;

@@ -87,7 +87,7 @@ void UIContainer::create_effect_windows() {
 	dlgProgress.create(300, 20, this);
 	dlgProgress.set_progress(0.);
 
-	dlgEffect = new UIDContBright();
+	dlgEffect = new UIDSurfaceBlur();
 
 	dlgEffect->config(3, 3);
 	dlgEffect->create(this);
@@ -317,12 +317,12 @@ void UIContainer::on_window_closed(UIWindow* window, size_t wmsg) {
 	else if (window == currEffectDlg) {
 		if (wmsg == DialogButtonId::OK) {
 			progress = 0.;
-			bCopyResult = false;
-			bApplyThreadRunning = true;
+			bCopyResult = true;
+			/*bApplyThreadRunning = true;
 			std::thread thread(&UIContainer::apply_thread, this);
 			thread.detach();
 			tempImage.free();
-			dlgProgress.show_window();
+			dlgProgress.show_window();*/
 			set_timer(1, 10);
 		}
 		else if (wmsg == DialogButtonId::Cancel) {
@@ -352,7 +352,7 @@ void UIContainer::on_timer(uint32_t nTimer) {
 void UIContainer::copy_result() {
 	auto dstImage = document.snap_shot(currEffectDlg->title);
 	if (dstImage)
-		dstImage->copy(&tempImage);
+		dstImage->copy(document.get_frame());
 	document.reset_frame();
 
 	dlgProgress.show_window(false);

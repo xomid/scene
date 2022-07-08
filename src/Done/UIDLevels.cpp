@@ -11,8 +11,16 @@ void UIDLevels::reset_image() {
 	cHisto.set_image(document ? document->get_image() : 0);
 }
 
+void UIDLevels::on_destroy() {
+	if (blob) delete blob;
+	blob = NULL;
+}
+
 void UIDLevels::on_init() {
 	set_title(L"Levels");
+
+	blob = new LevelsBlob();
+	currentChannelInfo = &rgbInfo;
 
 	selPreset.create(this);
 	selChannel.create(this);
@@ -124,7 +132,27 @@ void UIDLevels::on_resize(int width, int height) {
 }
 
 void UIDLevels::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
-	if (message == Event::Update) {
+	if (element == &selPreset) {
+		load_preset(selPreset.get_selected_option_index());
+	}
+	else if (element == &selChannel) {
+		currentChannelInfo = get_channel_info(selChannel.get_selected_option_index());
+		
+		slRange.set_value(0, currentChannelInfo->minRange);
+		slRange.set_value(2, currentChannelInfo->maxRange);
+		slOutput.set_value(0, currentChannelInfo->outputMin);
+		slOutput.set_value(1, currentChannelInfo->outputMax);
+		numMin.set_value(currentChannelInfo->outputMin);
+		numMax.set_value(currentChannelInfo->outputMax);
+		numLow.set_value(currentChannelInfo->minRange);
+		numHigh.set_value(currentChannelInfo->maxRange);
+		numMid.set_value(currentChannelInfo->gamma);
+
+		auto f = currentChannelInfo->gamma;
+		auto t = 1. - pow((f - 0.01) / 9.98, 0.299998);
+		slRange.set_value(1, t);
+	}
+	else if (message == Event::Update) {
 		if (element == &numLow) {
 			slRange.set_value(0, atof(numLow.get_number().c_str()));
 		}
@@ -148,12 +176,21 @@ void UIDLevels::process_event(OUI* element, uint32_t message, uint64_t param, bo
 			auto t = slRange.get_value(1); // [0-1]
 			// convert to [.01-9.99]
 			auto f = pow(1. - t, 1 / 0.299998) * 9.98 + 0.01;
+			currentChannelInfo->gamma = f;
 			numMid.set_value(f);
 		}
 		else if (element == &slOutput) {
 			numMin.set_value(slOutput.get_value(0));
 			numMax.set_value(slOutput.get_value(1));
 		}
+
+		selPreset.select_option(9);
+		currentChannelInfo->minRange = slRange.get_value(0);
+		currentChannelInfo->maxRange = slRange.get_value(2);
+		currentChannelInfo->outputMin = slOutput.get_value(0);
+		currentChannelInfo->outputMax = slOutput.get_value(1);
+		if (currentChannelInfo != &rgbInfo) currentChannelInfo->fill_lookup(&rgbInfo);
+
 		bInvalidate = true;
 	}
 	else {
@@ -161,8 +198,89 @@ void UIDLevels::process_event(OUI* element, uint32_t message, uint64_t param, bo
 	}
 }
 
-void UIDLevels::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+ChannelLevelInfo* UIDLevels::get_channel_info(size_t index) {
+	if (index == 1)
+		return &redInfo;
+	if (index == 2)
+		return &greenInfo;
+	if (index == 3)
+		return &blueInfo;
+	return &rgbInfo;
+}
+
+void UIDLevels::load_preset(size_t presetId) {
+	ChannelLevelInfo* channelInfo;
+
+	if (presetId > 8) return;
+
+	for (size_t i = 0; i < 4; i++)
+	{
+		channelInfo = get_channel_info(i);
+		channelInfo->minRange = 0;
+		channelInfo->maxRange = 255;
+		channelInfo->gamma = 1.;
+		channelInfo->outputMin = 0;
+		channelInfo->outputMax = 255;
+	}
+
+	switch (presetId)
+	{
+	case 1:
+		rgbInfo.minRange = 15;
+		break;
+	case 2:
+		rgbInfo.minRange = 10;
+		rgbInfo.maxRange = 245;
+		break;
+	case 3:
+		rgbInfo.minRange = 20;
+		rgbInfo.maxRange = 235;
+		break;
+	case 4:
+		rgbInfo.minRange = 30;
+		rgbInfo.maxRange = 225;
+		break;
+	case 5:
+		rgbInfo.gamma = 1.6;
+		break;
+	case 6:
+		rgbInfo.maxRange = 230;
+		break;
+	case 7:
+		rgbInfo.gamma = 1.25;
+		break;
+	case 8:
+		rgbInfo.gamma = 0.75;
+		break;
+
+	default:
+		break;
+	}
+
+	redInfo.fill_lookup(&rgbInfo);
+	greenInfo.fill_lookup(&rgbInfo);
+	blueInfo.fill_lookup(&rgbInfo);
+
+	slRange.set_value(1, 1. - pow((currentChannelInfo->gamma - 0.01) / 9.98, 0.299998));
+	slRange.set_range(currentChannelInfo->minRange, currentChannelInfo->maxRange);
+	isNew = true;
+
+	numLow.set_value(currentChannelInfo->minRange);
+	numMid.set_value(currentChannelInfo->gamma);
+	numHigh.set_value(currentChannelInfo->maxRange);
+	slRange.set_value(0, currentChannelInfo->minRange);
+	slRange.set_value(2, currentChannelInfo->maxRange);
+
+	numMin.set_value(currentChannelInfo->outputMin);
+	numMax.set_value(currentChannelInfo->outputMax);
+	slOutput.set_value(0, currentChannelInfo->outputMin);
+	slOutput.set_value(1, currentChannelInfo->outputMax);
+
+	bInvalidate = true;
+}
+
+int UIDLevels::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::levels(srcImage, dstImage, &blob, low, mid, high, min, max,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::levels(srcImage, dstImage, blob, rgbInfo, redInfo, greenInfo, blueInfo,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

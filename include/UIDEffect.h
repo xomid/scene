@@ -17,7 +17,7 @@ protected:
 	static size_t verticalBlockCount, horizontalBlockCount;
 	UICheck chkPreview;
 	Document* document;
-	bool bPreview, bRenderThreadRunning, bInvalidate, bTerminate, bUpdateView, bViewUpdated;
+	bool bPreview, bRenderThreadRunning, bInvalidate, bTerminate, bUpdateView, bViewUpdated, bCompleteRendering;
 
 	// this is a dummy function and is used so that compiler 
 	// doesnt optimize away an empty useless while loop

@@ -11,6 +11,12 @@ void gradient_func_gray_blue(void* param, double t, Color& res) {
 	res.r = res.g = 127 - int(t * 127 + .5);
 }
 
+void UIDHSL::HSL::reset() {
+	hue = 0;
+	saturation = 0;
+	lightness = 0;
+}
+
 void UIDHSL::measure_size(int* width, int* height) {
 	if (width) *width = 320;
 	if (height) *height = 290;
@@ -33,14 +39,17 @@ void UIDHSL::on_init() {
 	cSaturation.set_gradient(gradient_func_gray_blue);
 	cLightness.set_gradient(gradient_func_black_white);
 
-	hue = saturation = lightness = 0;
-	cHue.config((double)hue, 1, -180, 180, 60);
-	cSaturation.config((double)saturation, 1, -100, 100, 60);
-	cLightness.config((double)lightness, 1, -100, 100, 60);
+	hsl.reset();
+	colorizeHsl.reset();
+	normalHsl.reset();
+
+	cHue.config(0., 1, -180, 180, 60);
+	cSaturation.config(0., 1, -100, 100, 60);
+	cLightness.config(0., 1, -100, 100, 60);
 
 	selPreset.set_title(L"Preset");
 	chkColorize.set_text(L"Colorize");
-	chkColorize.select(bColorize = true);
+	chkColorize.select(shouldColorize = true);
 
 	int optH = 30, sepH = 10;
 	selPreset.add_option<UIButton>(L"Default", optH);
@@ -57,6 +66,7 @@ void UIDHSL::on_init() {
 	selPreset.add_option<UIButton>(L"Custom", optH);
 
 	selPreset.select_option(0);
+	load_preset(0);
 }
 
 void UIDHSL::on_resize(int width, int height) {
@@ -93,24 +103,24 @@ void UIDHSL::process_event(OUI* element, uint32_t message, uint64_t param, bool 
 		bool presetCustomized = true;
 
 		if (element == &cHue) {
-			hue = cHue.get_value();
+			hsl.hue = cHue.get_value();
 			bInvalidate = true;
 		}
 		else if (element == &cSaturation) {
-			saturation = cSaturation.get_value();
+			hsl.saturation = cSaturation.get_value();
 			bInvalidate = true;
 		}
 		else if (element == &cLightness) {
-			lightness = cLightness.get_value();
+			hsl.lightness = cLightness.get_value();
 			bInvalidate = true;
 		}
 		else if (element == &chkColorize) {
 			if (message == Event::Select || message == Event::Deselect) {
-				auto prevState = bColorize;
+				auto prevState = shouldColorize;
 				chkColorize.select(message == Event::Select);
-				bColorize = chkColorize.bSelected;
+				shouldColorize = chkColorize.bSelected;
 				colorize();
-				bInvalidate = bColorize != prevState;
+				bInvalidate = shouldColorize != prevState;
 			}
 		}
 		else {
@@ -124,116 +134,97 @@ void UIDHSL::process_event(OUI* element, uint32_t message, uint64_t param, bool 
 
 }
 
-void UIDHSL::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDHSL::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	ImageEffect::hsl(srcImage, dstImage, &blob, bColorize, hue, saturation, lightness,
+	return ImageEffect::hsl(srcImage, dstImage, &blob, shouldColorize, hsl.hue, hsl.saturation, hsl.lightness,
 		blockLeft, blockTop, blockRight, blockBottom);
 }
 
 void UIDHSL::colorize() {
-	/*int h, s, l;
-	h = s = l = 0;
-	double val[6] = { 0, 252, 255, 0, 0.25, 0 };
-
-	if (bColorize)
+	if (shouldColorize)
 	{
-		lNocHue = lHue; lNocSat = lSat; lNocLit = lLit;
-		lHue = lColHue; lSat = lColSat; lLit = lColLit;
-		scHue.SetRange(0, 360, lColHue);
-		scSat.SetRange(0, 100, lColSat);
-		scLit.SetRange(-100, 100, lColLit);
+		normalHsl = hsl;
+		hsl = colorizeHsl;
+		cHue.config((double)hsl.hue, 1., 0., 360., 60);
+		cSaturation.config((double)hsl.saturation, 1., 0., 100., 60);
 	}
 	else
 	{
-		lColHue = lHue; lColSat = lSat; lColLit = lLit;
-		lHue = lNocHue; lSat = lNocSat; lLit = lNocLit;
-		scHue.SetRange(-180, 180, lNocHue);
-		scSat.SetRange(-100, 100, lNocSat);
-		scLit.SetRange(-100, 100, lNocLit);
-	}*/
-
-	if (bColorize) {
-		cHue.config((double)hue, 1, -180, 180, 60);
-		cSaturation.config((double)saturation, 1, -100, 100, 60);
-	}
-	else {
-		cHue.config((double)hue, 1, 0, 360, 60);
-		cSaturation.config((double)saturation, 1, 0, 100, 60);
+		colorizeHsl = hsl;
+		hsl = normalHsl;
+		cHue.config((double)hsl.hue, 1., -180., 180., 60);
+		cSaturation.config((double)hsl.saturation, 1., -100., 100., 60);
 	}
 
-	hue = (int)cHue.get_value();
-	saturation = (int)cSaturation.get_value();
+	bInvalidate = true;
 }
 
 void UIDHSL::load_preset(size_t presetId) {
-	/*if (presetId > 8) {
-		selPreset.select_option(9);
+	if (presetId > 8) {
+		if (selPreset.get_selected_option_index() != 9) 
+			selPreset.select_option(9);
 	}
 	else {
-		bNew = 1;
-		lHue = lSat = lLit = 0;
-		bColorize = 0;
-		lColHue = nPreset ? 66 : 0;
-		lColSat = 25;
-		lColLit = 0;
-		lNocHue = 0;
-		lNocSat = 0;
-		lNocLit = 0;
+		hsl.reset();
+		colorizeHsl.reset();
+		normalHsl.reset();
+		shouldColorize = false;
+		colorizeHsl.hue = presetId ? 66 : 0;
+		colorizeHsl.saturation = 25;
 
-		switch (nPreset)
+		switch (presetId)
 		{
 		case 1:
-			bColorize = 1;
-			lColHue = 215;
+			shouldColorize = true;
+			colorizeHsl.hue = 215;
 			break;
 		case 2:
-			lNocSat = 30;
+			normalHsl.saturation = 30;
 			break;
 		case 3:
-			lNocSat = 10;
+			normalHsl.saturation = 10;
 			break;
 		case 4:
-			lNocSat = -40;
-			lNocLit = 5;
+			normalHsl.saturation = -40;
+			normalHsl.lightness = 5;
 			break;
 		case 5:
-			lNocHue = -5;
-			lNocSat = 20;
+			normalHsl.hue = -5;
+			normalHsl.saturation = 20;
 			break;
 		case 6:
-			lColHue = 35;
-			bColorize = 1;
+			colorizeHsl.hue = 35;
+			shouldColorize = true;
 			break;
 		case 7:
-			lNocSat = 50;
+			normalHsl.saturation = 50;
 			break;
 		case 8:
-			lColHue = 18;
-			lNocHue = 5;
-			lNocSat = 20;
+			colorizeHsl.hue = 18;
+			normalHsl.hue = 5;
+			normalHsl.saturation = 20;
 			break;
 		default:
 			break;
 		}
 
-		chkColorize.Set_Check(bColorize);
+		chkColorize.select(shouldColorize);
 
-		if (bColorize)
+		if (shouldColorize)
 		{
-			lHue = lColHue; lSat = lColSat; lLit = lColLit;
-			cHue.config(lColHue, 1., 0., 360.);
-			scSat.config(lColSat, 1., 0., 100);
-			scSat.SetRange(0, 100, lColSat);
-			scLit.SetRange(-100, 100, lColLit);
+			hsl = colorizeHsl;
+			cHue.config((double)hsl.hue, 1., 0., 360., 60);
+			cSaturation.config((double)hsl.saturation, 1., 0., 100., 60);
 		}
 		else
 		{
-			lHue = lNocHue; lSat = lNocSat; lLit = lNocLit;
-			cHue.SetRange(-180, 180, lNocHue);
-			scSat.SetRange(-100, 100, lNocSat);
-			scLit.SetRange(-100, 100, lNocLit);
+			hsl = normalHsl;
+			cHue.config((double)hsl.hue, 1., -180., 180., 60);
+			cSaturation.config((double)hsl.saturation, 1., -100., 100., 60);
 		}
 
-		ApplyHue();
-	}*/
+		cLightness.config((double)hsl.lightness, 1., -100., 100., 60);
+
+		bInvalidate = true;
+	}
 }

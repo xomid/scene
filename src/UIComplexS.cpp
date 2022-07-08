@@ -16,6 +16,11 @@ void UIComplexS::config(std::string value, std::string step, std::string minValu
 	this->numberFieldWidth = (int)numberFieldWidth;
 }
 
+void UIComplexS::set_value(double value) {
+	slide.set_value(value);
+	number.set_value(value);
+}
+
 double UIComplexS::get_value() const {
 	return slide.get_value();
 }

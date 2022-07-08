@@ -12,7 +12,16 @@ void UIDCurves::reset_image() {
 	cCurve.set_image(document != NULL ? document->get_image() : 0);
 }
 
+void UIDCurves::on_destroy() {
+	if (blob) delete blob;
+	blob = NULL;
+}
+
 void UIDCurves::on_init() {
+	set_title(L"Curves");
+
+	blob = new CurvesBlob();
+
 	selPreset.create(this);
 	selChannel.create(this);
 	grpModes.create(this);
@@ -115,14 +124,15 @@ void UIDCurves::on_resize(int width, int height) {
 void UIDCurves::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cCurve) {
 		calc_lookup_tables();
+		selPreset.select_option(10);
+		bInvalidate = true;
 	}
 	else if (element == &selPreset) {
 		if (message == Event::Update) {
 			int presetId = selPreset.get_selected_option_index();
-			if (presetId >= 1) {
-				load_preset((size_t)presetId);
-				calc_lookup_tables();
-			}
+			load_preset((size_t)presetId);
+			calc_lookup_tables();
+			bInvalidate = true;
 		}
 	}
 	else if (element == &selChannel) {
@@ -130,13 +140,13 @@ void UIDCurves::process_event(OUI* element, uint32_t message, uint64_t param, bo
 		ColorChannel c = ColorChannel::RGB;
 		auto selIndex = selChannel.get_selected_option_index();
 		switch (selIndex) {
-		case 2:
+		case 1:
 			c = ColorChannel::Red;
 			break;
-		case 3:
+		case 2:
 			c = ColorChannel::Green;
 			break;
-		case 4:
+		case 3:
 			c = ColorChannel::Blue;
 			break;
 		}
@@ -164,17 +174,17 @@ void UIDCurves::calc_lookup_tables() {
 	auto greenLookup = cCurve.GetData(2);
 	auto blueLookup = cCurve.GetData(3);
 
-	memcpy(blob.vlookup, valueLookup, 256);
-	memcpy(blob.blookup, blueLookup, 256);
-	memcpy(blob.glookup, greenLookup, 256);
-	memcpy(blob.rlookup, redLookup, 256);
+	memcpy(blob->gray, valueLookup, 256);
+	memcpy(blob->red, redLookup, 256);
+	memcpy(blob->green, greenLookup, 256);
+	memcpy(blob->blue, blueLookup, 256);
 
 	bInvalidate = true;
 }
 
-void UIDCurves::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDCurves::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	ImageEffect::curves(srcImage, dstImage, &blob, blockLeft, blockTop, blockRight, blockBottom);
+	return ImageEffect::curves(srcImage, dstImage, blob, blockLeft, blockTop, blockRight, blockBottom);
 }
 
 void UIDCurves::load_preset(size_t presetId)
