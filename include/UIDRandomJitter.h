@@ -5,7 +5,7 @@
 class UIDRandomJitter : public UIDEffect
 {
 	UIComplexS cAmount;
-	int amount;
+	size_t amount;
 
 public:
 	void measure_size(int* width, int* height) override;

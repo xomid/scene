@@ -6,6 +6,11 @@ void UIDStamp::measure_size(int* width, int* height) {
 	if (height) *height = 170;
 }
 
+void UIDStamp::on_destroy() {
+	if (blob) delete blob;
+	blob = NULL;
+}
+
 void UIDStamp::on_init() {
 	set_title(L"Stamp");
 	cRadius.create(this);
@@ -16,6 +21,8 @@ void UIDStamp::on_init() {
 	threshold = 0;
 	cRadius.config(0., 1., 0., 100., 60);
 	cThreshold.config(0., 1., 0., 100., 60);
+
+	blob = new StampBlob();
 }
 
 void UIDStamp::on_resize(int width, int height) {
@@ -33,11 +40,11 @@ void UIDStamp::on_resize(int width, int height) {
 
 void UIDStamp::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cRadius) {
-		radius = (int)cRadius.get_value();
+		radius = (size_t)cRadius.get_value();
 		bInvalidate = true;
 	}
 	else if (element == &cThreshold) {
-		threshold = (int)cThreshold.get_value();
+		threshold = cThreshold.get_value();
 		bInvalidate = true;
 	}
 	else {
@@ -45,8 +52,8 @@ void UIDStamp::process_event(OUI* element, uint32_t message, uint64_t param, boo
 	}
 }
 
-void UIDStamp::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDStamp::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, radius,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::stamp(srcImage, dstImage, blob, radius, threshold,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

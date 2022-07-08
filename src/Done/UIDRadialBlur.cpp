@@ -23,6 +23,8 @@ void UIDRadialBlur::on_init() {
 	label.canvas.art.alignX = Align::LEFT;
 
 	amount = 1;
+	cx = .5;
+	cy = .5;
 	cAmount.config((double)amount, 1., 1., 100., 80);
 	cBlur.set_amount(amount);
 	cBlur.set_blur_mode(RadialBlurMode::Spin);
@@ -69,13 +71,17 @@ void UIDRadialBlur::process_event(OUI* element, uint32_t message, uint64_t param
 			bInvalidate = true;
 		}
 	}
+	else if (element == &cBlur) {
+		cBlur.get_pivot_point(cx, cy);
+		bInvalidate = true;
+	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);
 	}
 }
 
-void UIDRadialBlur::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDRadialBlur::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, threshold,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::radial_blur(srcImage, dstImage, blurMode, amount, cx, cy,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

@@ -6,6 +6,11 @@ void UIDCrystalize::measure_size(int* width, int* height) {
 	if (height) *height = 320;
 }
 
+void UIDCrystalize::on_destroy() {
+	if (blob) delete blob;
+	blob = NULL;
+}
+
 void UIDCrystalize::on_init() {
 	set_title(L"Crystalize");
 
@@ -43,6 +48,8 @@ void UIDCrystalize::on_init() {
 	selMode.set_title(L"Mode");
 	selMode.select_option(0);
 	mode = CrystalizeMode::Random;
+
+	blob = new CrystalizeBlob();
 }
 
 void UIDCrystalize::on_resize(int width, int height) {
@@ -119,7 +126,7 @@ void UIDCrystalize::process_event(OUI* element, uint32_t message, uint64_t param
 
 int UIDCrystalize::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	return ImageEffect::crystalize(srcImage, dstImage, mode, shouldFadeEdges,
+	return ImageEffect::crystalize(srcImage, dstImage, blob, mode, shouldFadeEdges,
 		edgeThickness, randomness, distancePower, scale,
 		blockLeft, blockTop, blockRight, blockBottom);
 }

@@ -3,15 +3,21 @@
 
 void UIDPosterize::measure_size(int* width, int* height) {
 	if (width) *width = 320;
-	if (height) *height = 140;
+	if (height) *height = 110;
+}
+
+void UIDPosterize::on_destroy() {
+	if (blob) delete blob;
+	blob = NULL;
 }
 
 void UIDPosterize::on_init() {
 	set_title(L"Posterize");
-	cLevels.create(this);
-	cLevels.set_text(L"Levels");
+	cThreshold.create(this);
+	cThreshold.set_text(L"Threshold");
 	threshold = 0;
-	cLevels.config((double)threshold, 1, 0, 255, 60);
+	cThreshold.config((double)threshold, 1, 2, 255, 60);
+	blob = new PosterizeBlob();
 }
 
 void UIDPosterize::on_resize(int width, int height) {
@@ -23,12 +29,12 @@ void UIDPosterize::on_resize(int width, int height) {
 	l = 0;
 	t = 0;
 	botttomMargin = 5;
-	cLevels.move(l, t, w, h);
+	cThreshold.move(l, t, w, h);
 }
 
 void UIDPosterize::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
-	if (element == &cLevels) {
-		threshold = cLevels.get_value();
+	if (element == &cThreshold) {
+		threshold = (byte)cThreshold.get_value();
 		bInvalidate = true;
 	}
 	else {
@@ -36,8 +42,8 @@ void UIDPosterize::process_event(OUI* element, uint32_t message, uint64_t param,
 	}
 }
 
-void UIDPosterize::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDPosterize::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, threshold,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::posterize(srcImage, dstImage, blob, threshold,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

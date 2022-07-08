@@ -25,7 +25,7 @@ enum class CrystalizeMode {
 	Random, Square, Hexagonal, Octagonal, Triangular
 };
 
-enum class BlurMode {
+enum class RadialBlurMode {
 	Spin, Zoom
 };
 
@@ -68,14 +68,11 @@ public:
 	HistogramBlob();
 };
 
-struct BrightnessContrastBlob : public ImageEffectBlob {
-public:
-	unsigned char blookup[256], clookup[256];
+struct BrightnessContrastBlob : public GrayLookup, public ImageEffectBlob {
 	int brightness, contrast;
 	bool bLegacy;
-
-	BrightnessContrastBlob();
-	int init_lookups(int brightness, int contrast, bool bLegacy);
+public:
+	int init(int brightness, int contrast, bool bLegacy);
 };
 
 struct ChannelMixInfo {
@@ -117,6 +114,7 @@ public:
 };
 
 struct PosterizeBlob : public GrayLookup, public ImageEffectBlob {
+	byte threshold;
 public:
 	int init(byte threshold);
 };
@@ -130,19 +128,13 @@ public:
 	int init(int& softness, int& brightness, int& contrast);
 };
 
-
-struct MedianBlob : public GrayLookup, public ImageEffectBlob {
+typedef struct MedianBlob : public GrayLookup, public ImageEffectBlob {
 private:
-	size_t radius, percentile;
+	size_t radius, intensity;
 public:
 	int leadingEdgeX[256], ha[256], hr[256], hg[256], hb[256];
-	int init(size_t& radius, size_t& percentile);
-};
-
-
-
-
-
+	int init(size_t& radius, size_t& intensity);
+} OutlineBlob;
 
 struct GainBlob : public GrayLookup, public ImageEffectBlob {
 	double gain, bias;
@@ -150,6 +142,122 @@ public:
 	int init(double gain, double bias);
 };
 
+struct YPoint
+{
+	int index;
+	float x, y;
+	float dx, dy;
+	float cubeX, cubeY;
+	float distance;
+};
+
+struct CrystalizeBlob : public ImageEffectBlob
+{
+public:
+
+	float edgeThickness = 0.35f;
+	bool fadeEdges;
+	float scale = 9.0f;
+	float stretch = 1.0f;
+	float amount = 1.0f;
+	float turbulence = 1.0f;
+	float distancePower = 3.0f;
+	float randomness = 1.0;
+	CrystalizeMode mode = CrystalizeMode::Hexagonal;
+	byte probabilities[8096];
+	float angleCoefficient;
+	float gradientCoefficient;
+
+	static constexpr size_t B = 0x100;
+	static constexpr size_t BM = 0xff;
+	static constexpr size_t N = 0x1000;
+
+	int p[B + B + 2];
+	float g3[B + B + 2][3];
+	float g2[B + B + 2][2];
+	float g1[B + B + 2];
+	bool start;
+	YPoint results[3];
+
+	int init();
+
+	float noise2(float x, float y);
+
+	float checkCube(float x, float y, int cubeX, int cubeY);
+};
+
+struct MarbleBlob : public ImageEffectBlob {
+	double telorance, scale;
+public:
+	int pp[514];
+	float g3[514][3];
+	float g2[514][2];
+	float g1[514];
+	float sinTable[256], cosTable[256], out[2];
+	int init(double& telorance, double& scale);
+};
+
+
+struct OldPaintBlob : public ImageEffectBlob {
+public:
+	int localStore[20480];
+};
+
+
+struct PencilSketchBlob : public GrayLookup, public ImageEffectBlob {
+private:
+	size_t brushSize;
+	int range;
+public:
+	int weights[100 * 2 + 1];
+	byte localStore[19296];
+	int init(size_t& brushSize, int& range);
+};
+
+struct ThresholdBlob : public GrayLookup, public ImageEffectBlob {
+private:
+	byte threshold;
+	bool isMonochromatic;
+public:
+	int init(byte threshold, bool isMonochromatic);
+};
+
+struct SurfaceBlurBlob : public ImageEffectBlob {
+private:
+	double radius, level;
+public:
+	float mat[101];
+	unsigned short imat[202];
+	int init(double& radius, double& level);
+};
+
+struct StampBlob : public ImageEffectBlob {
+private:
+	size_t radius;
+	double threshold;
+public:
+	int weights[100 * 2 + 1];
+	byte localStore[19296];
+	int init(size_t& radius, double& threshold);
+};
+
+struct SoftPortraitBlob : public GrayLookup, public ImageEffectBlob {
+private:
+	size_t softness, warmness;
+	int brightness;
+public:
+	int weights[41];
+	byte localStore[41 * 6 * 16];
+	int init(size_t& softness, size_t& warmness, int& brightness);
+};
+
+struct SmartBlurBlob : public ImageEffectBlob {
+private:
+	size_t radius, threshold;
+public:
+	float kernel[201];
+	int init(size_t& radius, size_t& threshold);
+};
 
 class ImageEffect
 {
@@ -217,11 +325,11 @@ public:
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// levels [2, 255]
-	static int posterize(Sheet* srcImage, Sheet* dstImage, PosterizeBlob* blob, byte levels,
+	static int posterize(Sheet* srcImage, Sheet* dstImage, PosterizeBlob* blob, byte threshold,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// levels [0, 255]
-	static int threshold(Sheet* srcImage, Sheet* dstImage, bool isMonochromatic, byte levels,
+	static int threshold(Sheet* srcImage, Sheet* dstImage, ThresholdBlob* blob, bool isMonochromatic, byte threshold,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// filter effects
@@ -247,8 +355,8 @@ public:
 	// edgeThickness, randomness [0, 1]
 	// distancePower [0.01, 10]
 	// scale [0.01, 256]
-
-	static int crystalize(Sheet* srcImage, Sheet* dstImage, CrystalizeMode crystalizeMode, bool shouldFadeEdges,
+	static int crystalize(Sheet* srcImage, Sheet* dstImage, CrystalizeBlob* crystalizeBlob, 
+		CrystalizeMode crystalizeMode, bool shouldFadeEdges,
 		double edgeThickness, double randomness, double distancePower, double scale,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
@@ -270,7 +378,7 @@ public:
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// telorance, scale [0, 100]
-	static int marble(Sheet* srcImage, Sheet* dstImage, double telorance, double scale,
+	static int marble(Sheet* srcImage, Sheet* dstImage, MarbleBlob* blob, double telorance, double scale,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	static int maximum(Sheet* srcImage, Sheet* dstImage,
@@ -291,17 +399,17 @@ public:
 
 	// brushSize [1, 100]
 	// coareness [3, 255]
-	static int old_paint(Sheet* srcImage, Sheet* dstImage, size_t brushSize, size_t coareness,
+	static int old_paint(Sheet* srcImage, Sheet* dstImage, OldPaintBlob* blob, size_t brushSize, size_t coareness,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// radius [1, 200]
 	// intensity [0, 100]
-	static int outline(Sheet* srcImage, Sheet* dstImage, size_t radius, size_t intensity,
+	static int outline(Sheet* srcImage, Sheet* dstImage, OutlineBlob* blob, size_t radius, size_t intensity,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// brushSize [1, 50]
 	// range [-20, 20]
-	static int pencil_sketch(Sheet* srcImage, Sheet* dstImage, size_t brushSize, size_t range, 
+	static int pencil_sketch(Sheet* srcImage, Sheet* dstImage, PencilSketchBlob* blob, size_t brushSize, int range,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// cellSize [1, 200]
@@ -310,7 +418,7 @@ public:
 
 	// amount [1, 100]
 	// pivotX, pivotY [0, 1]
-	static int radial_blur(Sheet* srcImage, Sheet* dstImage, BlurMode blurMode, double amount, double pivotX, double pivotY,
+	static int radial_blur(Sheet* srcImage, Sheet* dstImage, RadialBlurMode blurMode, double amount, double pivotX, double pivotY,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// amount [1, 200]
@@ -330,7 +438,7 @@ public:
 
 	// radius [3, 100]
 	// threshold [0, 255]
-	static int smart_blur(Sheet* srcImage, Sheet* dstImage, size_t radius, size_t threshold,
+	static int smart_blur(Sheet* srcImage, Sheet* dstImage, SmartBlurBlob* blob, size_t radius, size_t threshold,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// amount [1, 100]
@@ -341,16 +449,16 @@ public:
 	// softness [0, 10]
 	// warmness [0, 40]
 	// brightness [-100, 100]
-	static int soft_portrait(Sheet* srcImage, Sheet* dstImage, size_t softness, size_t warmness, int brightness,
+	static int soft_portrait(Sheet* srcImage, Sheet* dstImage, SoftPortraitBlob* blob, size_t softness, size_t warmness, int brightness,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// radius, threshold [0, 100]
-	static int stamp(Sheet* srcImage, Sheet* dstImage, size_t radius, double threshold,
+	static int stamp(Sheet* srcImage, Sheet* dstImage, StampBlob* blob, size_t radius, double threshold,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// radius [1, 100]
 	// level [2, 255]
-	static int surface_blur(Sheet* srcImage, Sheet* dstImage, double radius, double level,
+	static int surface_blur(Sheet* srcImage, Sheet* dstImage, SurfaceBlurBlob* blob, double radius, double level,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// angle [-PI/4, PI/4]

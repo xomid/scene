@@ -27,13 +27,13 @@ blockBottom = CLAMP3(0, blockBottom, h);
 
 int ImageEffect::channel_mixer(Sheet* srcImage, Sheet* dstImage, ChannelMixerBlob* blob, bool bMono, bool bPreserveLuminosity,
 	ChannelMixInfo red, ChannelMixInfo green, ChannelMixInfo blue, int blockLeft, int blockTop, int blockRight, int blockBottom) {
-	return 0;
+	return IMAGE_EFFECT_RESULT_OK;
 }
 
 
 int ImageEffect::color_balance(Sheet* srcImage, Sheet* dstImage, ColorBalanceBlob* blob, bool bPreserveLuminosity,
 	int red, int green, int blue, int blockLeft, int blockTop, int blockRight, int blockBottom) {
-	return 0;
+	return IMAGE_EFFECT_RESULT_OK;
 }
 
 
@@ -67,26 +67,50 @@ int ImageEffect::curves(Sheet* srcImage, Sheet* dstImage, CurvesBlob* blob,
 		}
 	}
 
-	return 0;
+	return IMAGE_EFFECT_RESULT_OK;
 }
 
 
 int ImageEffect::hsl(Sheet* srcImage, Sheet* dstImage, HSLBlob* blob, bool bColoize, int hue, int saturation, int lightness,
 	int blockLeft, int blockTop, int blockRight, int blockBottom) {
-	return 0;
+	return IMAGE_EFFECT_RESULT_OK;
 }
 
 
 int ImageEffect::levels(Sheet* srcImage, Sheet* dstImage, LevelsBlob* blob,
 	ChannelLevelInfo rgbInfo, ChannelLevelInfo redInfo, ChannelLevelInfo, ChannelLevelInfo blueInfo,
 	int blockLeft, int blockTop, int blockRight, int blockBottom) {
-	return 0;
+	return IMAGE_EFFECT_RESULT_OK;
 }
 
 
-int ImageEffect::threshold(Sheet* srcImage, Sheet* dstImage, bool isMonochromatic, byte levels,
+int ImageEffect::threshold(Sheet* srcImage, Sheet* dstImage, ThresholdBlob* blob, bool isMonochromatic, byte threshold,
 	int blockLeft, int blockTop, int blockRight, int blockBottom) {
-	return 0;
+
+	if (!blob || blob->init(threshold, isMonochromatic))
+		return 1;
+
+	if (!isMonochromatic)
+		return apply_lookup_gray(srcImage, dstImage, blob, blockLeft, blockTop, blockRight, blockBottom);
+
+	VALIDATE_IMAGES();
+	DECLARE_VARIABLES();
+	CLAMP_BLOCK();
+
+	byte* gray = blob->gray, g;
+	for (y = blockTop; y < blockBottom; ++y) {
+		s = src + y * p + blockLeft * 3;
+		d = dst + y * p + blockLeft * 3;
+		for (x = blockLeft; x < blockRight; ++x) {
+			g = gray[int((Max(Max(s[0], s[1]), s[2]) + Min(Min(s[0], s[1]), s[2])) / 2.0 + 0.5)];
+			*d++ = g;
+			*d++ = g;
+			*d++ = g;
+			s += 3;
+		}
+	}
+
+	return IMAGE_EFFECT_RESULT_OK;
 }
 
 

@@ -28,7 +28,7 @@ void UIDRandomJitter::on_resize(int width, int height) {
 
 void UIDRandomJitter::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cAmount) {
-		amount = cAmount.get_value();
+		amount = (size_t)cAmount.get_value();
 		bInvalidate = true;
 	}
 	else {
@@ -36,8 +36,8 @@ void UIDRandomJitter::process_event(OUI* element, uint32_t message, uint64_t par
 	}
 }
 
-void UIDRandomJitter::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDRandomJitter::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, gain,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::random_jitter(srcImage, dstImage, amount,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

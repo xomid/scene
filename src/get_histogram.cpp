@@ -6,7 +6,7 @@ HistogramBlob::HistogramBlob()
 
 int ImageEffect::get_histo(Sheet* srcImage, HistogramBlob* blob)
 {
-	if (srcImage == NULL || blob == NULL) return 1;
+	if (srcImage == NULL || blob == NULL) return IMAGE_EFFECT_RESULT_ERROR;
 
 	int i, x, y, nbpp, p, w, h;
 	byte gray, *data, *d;
@@ -53,5 +53,5 @@ int ImageEffect::get_histo(Sheet* srcImage, HistogramBlob* blob)
 		blob->rHisto[x] = ((double)blob->rHisto[x] * 255 / blob->rMax);
 	}
 
-	return 0;
+	return IMAGE_EFFECT_RESULT_OK;
 }

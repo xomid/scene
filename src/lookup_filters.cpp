@@ -154,13 +154,12 @@ int ImageEffect::negative(Sheet* srcImage, Sheet* dstImage,
 	return IMAGE_EFFECT_RESULT_OK;
 }
 
-int ImageEffect::posterize(Sheet* srcImage, Sheet* dstImage, PosterizeBlob* blob, byte levels,
+int ImageEffect::posterize(Sheet* srcImage, Sheet* dstImage, PosterizeBlob* blob, byte threshold,
 	int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	if (blob == NULL || blob->init(levels)) return 1;
+	if (blob == NULL || blob->init(threshold)) return 1;
 	return apply_lookup_gray(srcImage, dstImage, blob, blockLeft, blockTop, blockRight, blockBottom);
 }
-
 
 int GainBlob::init(double gain, double bias) {
 	gain = CLAMP3F(0., gain, 1.);
@@ -183,7 +182,6 @@ int GainBlob::init(double gain, double bias) {
 	}
 	return IMAGE_EFFECT_RESULT_OK;
 }
-
 
 int ImageEffect::gain(Sheet* srcImage, Sheet* dstImage, GainBlob* blob, double gain, double bias,
 	int blockLeft, int blockTop, int blockRight, int blockBottom) {

@@ -1,9 +1,6 @@
 #pragma once
 #include <oui_check.h>
-
-enum class RadialBlurMode {
-	Spin, Zoom
-};
+#include "ImageEffect.h"
 
 class UIRadialBlur : public UIButton
 {

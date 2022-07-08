@@ -60,8 +60,8 @@ void UIDMotionBlur::process_event(OUI* element, uint32_t message, uint64_t param
 	}
 }
 
-void UIDMotionBlur::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDMotionBlur::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, size,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::motion_blur(srcImage, dstImage, size, angle / 180. * PI, 
+		blockLeft, blockTop, blockRight, blockBottom);
 }

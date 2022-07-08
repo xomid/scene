@@ -6,6 +6,11 @@ void UIDSurfaceBlur::measure_size(int* width, int* height) {
 	if (height) *height = 170;
 }
 
+void UIDSurfaceBlur::on_destroy() {	
+	if (blob) delete blob;
+	blob = NULL;
+}
+
 void UIDSurfaceBlur::on_init() {
 	set_title(L"Surface Blur");
 	cRadius.create(this);
@@ -16,6 +21,8 @@ void UIDSurfaceBlur::on_init() {
 	level = 2;
 	cRadius.config(1., 1., 1., 100., 60);
 	cLevel.config(2., 1., 2., 255., 60);
+
+	blob = new SurfaceBlurBlob();
 }
 
 void UIDSurfaceBlur::on_resize(int width, int height) {
@@ -33,11 +40,11 @@ void UIDSurfaceBlur::on_resize(int width, int height) {
 
 void UIDSurfaceBlur::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cRadius) {
-		radius = (int)cRadius.get_value();
+		radius = cRadius.get_value();
 		bInvalidate = true;
 	}
 	else if (element == &cLevel) {
-		level = (int)cLevel.get_value();
+		level = cLevel.get_value();
 		bInvalidate = true;
 	}
 	else {
@@ -45,8 +52,8 @@ void UIDSurfaceBlur::process_event(OUI* element, uint32_t message, uint64_t para
 	}
 }
 
-void UIDSurfaceBlur::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDSurfaceBlur::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, radius,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::surface_blur(srcImage, dstImage, blob, radius, level,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

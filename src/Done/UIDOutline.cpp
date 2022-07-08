@@ -6,6 +6,11 @@ void UIDOutline::measure_size(int* width, int* height) {
 	if (height) *height = 170;
 }
 
+void UIDOutline::on_destroy() {
+	if (blob) delete blob;
+	blob = NULL;
+}
+
 void UIDOutline::on_init() {
 	set_title(L"Outline");
 	cRadius.create(this);
@@ -16,6 +21,8 @@ void UIDOutline::on_init() {
 	intensity = 0;
 	cRadius.config(1., 1., 1., 200., 60);
 	cIntensity.config(0., 1., 0., 100., 60);
+
+	blob = new OutlineBlob();
 }
 
 void UIDOutline::on_resize(int width, int height) {
@@ -45,8 +52,8 @@ void UIDOutline::process_event(OUI* element, uint32_t message, uint64_t param, b
 	}
 }
 
-void UIDOutline::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDOutline::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, radius,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::outline(srcImage, dstImage, blob, radius, intensity,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

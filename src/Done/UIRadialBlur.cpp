@@ -4,7 +4,7 @@
 
 void UIRadialBlur::get_pivot_point(double& cx, double& cy) {
 	cx = this->cx;
-	cx = this->cy;
+	cy = this->cy;
 }
 
 void UIRadialBlur::set_amount(int amount) {

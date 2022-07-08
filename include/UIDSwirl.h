@@ -8,7 +8,7 @@ class UIDSwirl : public UIDEffect
 	UISwirl cSwirl;
 	UIComplexS cAngle;
 	double angle;
-	bool bStretch;
+	bool shouldStretch;
 
 public:
 	void measure_size(int* width, int* height) override;

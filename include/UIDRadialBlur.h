@@ -13,6 +13,7 @@ class UIDRadialBlur : public UIDEffect
 	UIRadio rdSpin, rdZoom;
 	UIComplexS cAmount;
 	int amount;
+	double cx, cy;
 	RadialBlurMode blurMode;
 
 public:

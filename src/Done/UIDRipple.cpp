@@ -59,14 +59,16 @@ void UIDRipple::process_event(OUI* element, uint32_t message, uint64_t param, bo
 			rippleMode = RippleMode::Sinuous;
 		else
 			rippleMode = RippleMode::Triangle;
+
+		bInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);
 	}
 }
 
-void UIDRipple::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDRipple::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, waveLength,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::ripple(srcImage, dstImage, rippleMode, waveLength, amplitude,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

@@ -6,6 +6,11 @@ void UIDSmartBlur::measure_size(int* width, int* height) {
 	if (height) *height = 170;
 }
 
+void UIDSmartBlur::on_destroy() {
+	if (blob) delete blob;
+	blob = NULL;
+}
+
 void UIDSmartBlur::on_init() {
 	set_title(L"Smart Blur");
 	cRadius.create(this);
@@ -16,6 +21,8 @@ void UIDSmartBlur::on_init() {
 	threshold = 0;
 	cRadius.config(3., 1., 3., 100., 60);
 	cThreshold.config(0., 1., 0., 255., 60);
+
+	blob = new SmartBlurBlob();
 }
 
 void UIDSmartBlur::on_resize(int width, int height) {
@@ -33,11 +40,11 @@ void UIDSmartBlur::on_resize(int width, int height) {
 
 void UIDSmartBlur::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cRadius) {
-		radius = (int)cRadius.get_value();
+		radius = (size_t)cRadius.get_value();
 		bInvalidate = true;
 	}
 	else if (element == &cThreshold) {
-		threshold = (int)cThreshold.get_value();
+		threshold = (size_t)cThreshold.get_value();
 		bInvalidate = true;
 	}
 	else {
@@ -45,8 +52,8 @@ void UIDSmartBlur::process_event(OUI* element, uint32_t message, uint64_t param,
 	}
 }
 
-void UIDSmartBlur::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDSmartBlur::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, radius,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::smart_blur(srcImage, dstImage, blob, radius, threshold,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

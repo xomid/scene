@@ -6,6 +6,11 @@ void UIDContBright::measure_size(int* width, int* height) {
 	if (height) *height = 190;
 }
 
+void UIDContBright::on_destroy() {
+	if (blob) delete blob;
+	blob = NULL;
+}
+
 void UIDContBright::on_init() {
 	scBright.create(this);
 	scContst.create(this);
@@ -21,6 +26,8 @@ void UIDContBright::on_init() {
 
 	chkLegacy.set_text(L"Legacy");
 	chkLegacy.select(bLegacy = true);
+
+	blob = new BrightnessContrastBlob();
 }
 
 void UIDContBright::on_resize(int width, int height) {
@@ -70,8 +77,8 @@ void UIDContBright::process_event(OUI* element, uint32_t message, uint64_t param
 	}
 }
 
-void UIDContBright::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom) 
+int UIDContBright::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom) 
 {
-	ImageEffect::brightness_contrast(srcImage, dstImage, &blob, bLegacy, brightness, contrast,
+	return ImageEffect::brightness_contrast(srcImage, dstImage, blob, bLegacy, brightness, contrast,
 		blockLeft, blockTop, blockRight, blockBottom);
 }

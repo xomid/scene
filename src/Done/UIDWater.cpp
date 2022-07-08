@@ -45,8 +45,8 @@ void UIDWater::process_event(OUI* element, uint32_t message, uint64_t param, boo
 	}
 }
 
-void UIDWater::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDWater::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, telorance,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::water(srcImage, dstImage, telorance, scale, .5, .5,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

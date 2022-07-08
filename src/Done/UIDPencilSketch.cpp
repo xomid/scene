@@ -6,6 +6,11 @@ void UIDPencilSketch::measure_size(int* width, int* height) {
 	if (height) *height = 170;
 }
 
+void UIDPencilSketch::on_destroy() {
+	if (blob) delete blob;
+	blob = NULL;
+}
+
 void UIDPencilSketch::on_init() {
 	set_title(L"Pencil Sketch");
 	cBrushSize.create(this);
@@ -16,6 +21,8 @@ void UIDPencilSketch::on_init() {
 	range = 0;
 	cBrushSize.config(1., 1., 1., 50., 60);
 	cRange.config(0., 1., -20., 20., 60);
+
+	blob = new PencilSketchBlob();
 }
 
 void UIDPencilSketch::on_resize(int width, int height) {
@@ -33,7 +40,7 @@ void UIDPencilSketch::on_resize(int width, int height) {
 
 void UIDPencilSketch::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cBrushSize) {
-		brushSize = (int)cBrushSize.get_value();
+		brushSize = (size_t)cBrushSize.get_value();
 		bInvalidate = true;
 	}
 	else if (element == &cRange) {
@@ -45,8 +52,8 @@ void UIDPencilSketch::process_event(OUI* element, uint32_t message, uint64_t par
 	}
 }
 
-void UIDPencilSketch::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDPencilSketch::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, brushSize,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::pencil_sketch(srcImage, dstImage, blob, brushSize, range,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

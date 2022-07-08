@@ -6,6 +6,11 @@ void UIDGain::measure_size(int* width, int* height) {
 	if (height) *height = 170;
 }
 
+void UIDGain::on_destroy() {
+	if (blob) delete blob;
+	blob = NULL;
+}
+
 void UIDGain::on_init() {
 	set_title(L"Gain");
 	cGain.create(this);
@@ -16,6 +21,8 @@ void UIDGain::on_init() {
 	bias = .5;
 	cGain.config("0.5", ".001", "0", "1.000", 80);
 	cBias.config("0.5", ".001", "0", "1.000", 80);
+
+	blob = new GainBlob();
 }
 
 void UIDGain::on_resize(int width, int height) {
@@ -47,6 +54,6 @@ void UIDGain::process_event(OUI* element, uint32_t message, uint64_t param, bool
 
 int UIDGain::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	return ImageEffect::gain(srcImage, dstImage, &blob, gain, bias,
+	return ImageEffect::gain(srcImage, dstImage, blob, gain, bias,
 		blockLeft, blockTop, blockRight, blockBottom);
 }

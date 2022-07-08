@@ -69,8 +69,8 @@ void UIDTileGlass::process_event(OUI* element, uint32_t message, uint64_t param,
 	}
 }
 
-void UIDTileGlass::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDTileGlass::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, size,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::tile_glass(srcImage, dstImage, size, amount, angle / 180. * PI, .5, .5,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

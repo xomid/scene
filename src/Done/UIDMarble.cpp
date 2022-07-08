@@ -6,6 +6,11 @@ void UIDMarble::measure_size(int* width, int* height) {
 	if (height) *height = 170;
 }
 
+void UIDMarble::on_destroy() {
+	if (blob) delete blob;
+	blob = NULL;
+}
+
 void UIDMarble::on_init() {
 	set_title(L"Marble");
 	cTelorance.create(this);
@@ -16,6 +21,8 @@ void UIDMarble::on_init() {
 	scale = 0;
 	cTelorance.config((double)telorance, 1., 0., 100., 60);
 	cScale.config((double)scale, 1., 0., 100., 60);
+
+	blob = new MarbleBlob();
 }
 
 void UIDMarble::on_resize(int width, int height) {
@@ -45,8 +52,8 @@ void UIDMarble::process_event(OUI* element, uint32_t message, uint64_t param, bo
 	}
 }
 
-void UIDMarble::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDMarble::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, telorance,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::marble(srcImage, dstImage, blob, telorance, scale,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

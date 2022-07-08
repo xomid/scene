@@ -9,6 +9,11 @@ void UIDThreshold::reset_image() {
 	cHisto.set_image(document ? document->get_image() : NULL);
 }
 
+void UIDThreshold::on_destroy() {
+	if (blob) delete blob;
+	blob = NULL;
+}
+
 void UIDThreshold::on_init() {
 	set_title(L"Threshold");
 
@@ -19,6 +24,8 @@ void UIDThreshold::on_init() {
 	cLevels.config((double)threshold, 1, 0, 255, 60);
 	chkMono.set_text(L"Monochrome");
 	chkMono.select(bMono = true);
+
+	blob = new ThresholdBlob();
 }
 
 void UIDThreshold::on_resize(int width, int height) {
@@ -59,7 +66,7 @@ void UIDThreshold::process_event(OUI* element, uint32_t message, uint64_t param,
 	}
 }
 
-void UIDThreshold::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDThreshold::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	ImageEffect::threshold(srcImage, dstImage, bMono, threshold, blockLeft, blockTop, blockRight, blockBottom);
+	return ImageEffect::threshold(srcImage, dstImage, blob, bMono, threshold, blockLeft, blockTop, blockRight, blockBottom);
 }

@@ -89,8 +89,8 @@ void UIDSmear::process_event(OUI* element, uint32_t message, uint64_t param, boo
 	}
 }
 
-void UIDSmear::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDSmear::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, amount,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::smear(srcImage, dstImage, smearMode, amount, mix, density, 0,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

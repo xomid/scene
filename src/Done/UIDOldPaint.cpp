@@ -6,6 +6,11 @@ void UIDOldPaint::measure_size(int* width, int* height) {
 	if (height) *height = 170;
 }
 
+void UIDOldPaint::on_destroy() {
+	if (blob) delete blob;
+	blob = NULL;
+}
+
 void UIDOldPaint::on_init() {
 	set_title(L"Old Paint");
 	cBrushSize.create(this);
@@ -16,6 +21,8 @@ void UIDOldPaint::on_init() {
 	coareness = 3;
 	cBrushSize.config(1., 1., 1., 100., 60);
 	cCoareness.config(3., 1., 3., 255., 60);
+
+	blob = new OldPaintBlob();
 }
 
 void UIDOldPaint::on_resize(int width, int height) {
@@ -33,11 +40,11 @@ void UIDOldPaint::on_resize(int width, int height) {
 
 void UIDOldPaint::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cBrushSize) {
-		brushSize = (int)cBrushSize.get_value();
+		brushSize = (size_t)cBrushSize.get_value();
 		bInvalidate = true;
 	}
 	else if (element == &cCoareness) {
-		coareness = (int)cCoareness.get_value();
+		coareness = (size_t)cCoareness.get_value();
 		bInvalidate = true;
 	}
 	else {
@@ -45,8 +52,8 @@ void UIDOldPaint::process_event(OUI* element, uint32_t message, uint64_t param, 
 	}
 }
 
-void UIDOldPaint::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDOldPaint::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, brushSize,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::old_paint(srcImage, dstImage, blob, brushSize, coareness,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

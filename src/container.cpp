@@ -1,13 +1,13 @@
 #include "container.h"
 #include <oui_uix.h>
+#include <chrono>
 #include "UIDOpenFile.h"
 #include "UIDSaveFile.h"
 
 UIDEffect* dlgEffect;
 
 void UIContainer::create_effect_windows() {
-	/*dlgProgress.create(300, 20, this);
-	dlgProgress.set_progress(0.);
+	/*
 
 	dlgContBright.config(3, 3);
 
@@ -82,11 +82,14 @@ void UIContainer::create_effect_windows() {
 	dlgTileGlass.set_document(&doc);
 	dlgWater.set_document(&doc);
 	dlgWave.set_document(&doc);
-	
 	*/
 
-	dlgEffect = new UIDMedian();
+	dlgProgress.create(300, 20, this);
+	dlgProgress.set_progress(0.);
 
+	dlgEffect = new UIDContBright();
+
+	dlgEffect->config(3, 3);
 	dlgEffect->create(this);
 	dlgEffect->set_document(&document);
 	show_effect(dlgEffect);
@@ -319,6 +322,7 @@ void UIContainer::on_window_closed(UIWindow* window, size_t wmsg) {
 			std::thread thread(&UIContainer::apply_thread, this);
 			thread.detach();
 			tempImage.free();
+			dlgProgress.show_window();
 			set_timer(1, 10);
 		}
 		else if (wmsg == DialogButtonId::Cancel) {
@@ -334,14 +338,14 @@ void UIContainer::on_timer(uint32_t nTimer) {
 		bUpdateProgress = false;
 	}
 
-	if (bCopyResult) {
-		bCopyResult = false;
+	if (bApplyThreadRunning == false || bCopyResult) {
 		kill_timer(1);
-		copy_result();
+		dlgProgress.show_window(false);
 	}
 
-	if (bApplyThreadRunning == false) {
-		kill_timer(1);
+	if (bCopyResult) {
+		bCopyResult = false;
+		copy_result();
 	}
 }
 

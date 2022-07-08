@@ -36,8 +36,8 @@ void UIDPixelate::process_event(OUI* element, uint32_t message, uint64_t param, 
 	}
 }
 
-void UIDPixelate::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDPixelate::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, gain,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::pixelate(srcImage, dstImage, cellSize,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

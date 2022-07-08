@@ -12,6 +12,7 @@ void UIDSwirl::on_init() {
 	cAngle.create(this);
 	cAngle.set_text(L"Angle");
 	angle = 0;
+	shouldStretch = false;
 	cAngle.config(angle, 1, -45, 45, 80);
 }
 
@@ -36,7 +37,7 @@ void UIDSwirl::process_event(OUI* element, uint32_t message, uint64_t param, boo
 		bInvalidate = true;
 	}
 	else if (element == &cSwirl) {
-		bStretch = cSwirl.is_stretched();
+		shouldStretch = cSwirl.is_stretched();
 		bInvalidate = true;
 	}
 	else {
@@ -44,8 +45,8 @@ void UIDSwirl::process_event(OUI* element, uint32_t message, uint64_t param, boo
 	}
 }
 
-void UIDSwirl::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDSwirl::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::posterize(srcImage, dstImage, angle,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::swirl(srcImage, dstImage, angle / 180. * PI, shouldStretch, .5, .5,
+		blockLeft, blockTop, blockRight, blockBottom);
 }

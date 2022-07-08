@@ -178,8 +178,8 @@ void UIDChannelMixer::process_event(OUI* element, uint32_t message, uint64_t par
 	}
 }
 
-void UIDChannelMixer::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDChannelMixer::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	/*ImageEffect::channel_mixer(srcImage, dstImage, &blob, bMono, bPreserveLum, red, green, blue,
-		blockLeft, blockTop, blockRight, blockBottom);*/
+	return ImageEffect::channel_mixer(srcImage, dstImage, blob, bMono, bPreserveLum, red, green, blue,
+		blockLeft, blockTop, blockRight, blockBottom);
 }
