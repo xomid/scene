@@ -94,29 +94,29 @@ void UIDCrystalize::process_event(OUI* element, uint32_t message, uint64_t param
 			mode = CrystalizeMode::Random;
 			break;
 		}
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cEdgeThinkness) {
 		edgeThickness = cEdgeThinkness.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cRandomness) {
 		randomness = cRandomness.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cDistancePower) {
 		distancePower = cDistancePower.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cScale) {
 		scale = cScale.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &chkFadeEdges) {
 		if (message == Event::Select || message == Event::Deselect) {
 			chkFadeEdges.select(message == Event::Select);
 			shouldFadeEdges = chkFadeEdges.bSelected;
-			bInvalidate = true;
+			shouldInvalidate = true;
 		}
 	}
 	else {

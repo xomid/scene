@@ -31,7 +31,7 @@ public:
 	void config_elements_based_on_document_status();
 	void set_document(Document* document);
 	void on_init() override;
-	void on_update() override;
+	void on_resize(int width, int height) override;
 	void process_event(OUI* element, uint32_t message,
 		uint64_t param, bool bubbleUp = true) override;
 };

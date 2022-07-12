@@ -41,11 +41,11 @@ void UIDMarble::on_resize(int width, int height) {
 void UIDMarble::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cTelorance) {
 		telorance = cTelorance.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cScale) {
 		scale = cScale.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);

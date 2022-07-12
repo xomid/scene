@@ -46,15 +46,15 @@ void UIDSoftPortrait::on_resize(int width, int height) {
 void UIDSoftPortrait::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cSoftness) {
 		softness = (size_t)cSoftness.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cWarmness) {
 		warmness = (size_t)cWarmness.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cBrightness) {
 		brightness = (int)cBrightness.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);

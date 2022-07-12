@@ -770,7 +770,7 @@ int ImageEffect::despeckle(Sheet* srcImage, Sheet* dstImage, size_t iteration,
 	return 2;
 }
 
-int ImageEffect::gussian_blur(Sheet* srcImage, Sheet* dstImage, size_t radius,
+int ImageEffect::gaussian_blur(Sheet* srcImage, Sheet* dstImage, size_t radius,
 	int blockLeft, int blockTop, int blockRight, int blockBottom) {
 
 	VALIDATE_IMAGES();
@@ -2013,7 +2013,7 @@ int ImageEffect::motion_blur(Sheet* srcImage, Sheet* dstImage, size_t size, doub
 	return IMAGE_EFFECT_RESULT_OK;
 }
 
-int ImageEffect::old_paint(Sheet* srcImage, Sheet* dstImage, OldPaintBlob* blob, size_t brushSize, size_t coareness,
+int ImageEffect::oil_paint(Sheet* srcImage, Sheet* dstImage, OldPaintBlob* blob, size_t brushSize, size_t coareness,
 	int blockLeft, int blockTop, int blockRight, int blockBottom) {
 	VALIDATE_IMAGES();
 	DECLARE_VARIABLES();

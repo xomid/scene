@@ -14,11 +14,9 @@ protected:
 	UILabel lblTitle;
 public:
 	void set_title(std::wstring title);
-
 	void on_init() override;
 	void on_resize(int width, int height) override;
-	void on_update() override;
-	void process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp = true) override;
+	void apply_theme(bool shouldInvalidate) override;
 	virtual void enable_element(uint32_t index, bool enable);
 };
 

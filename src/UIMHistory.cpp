@@ -53,6 +53,7 @@ void UIMHistory::update_history_list() {
 		historyItems.push_back(btn);
 	}
 
+	list.stretch();
 	invalidate();
 }
 

@@ -29,7 +29,7 @@ void UIDDespeckle::on_resize(int width, int height) {
 void UIDDespeckle::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cIteration) {
 		iteration = (size_t)cIteration.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);

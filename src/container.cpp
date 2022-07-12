@@ -8,7 +8,6 @@ UIDEffect* dlgEffect;
 
 void UIContainer::create_effect_windows() {
 	/*
-
 	dlgContBright.config(3, 3);
 
 	dlgContBright.create(this);
@@ -28,18 +27,18 @@ void UIContainer::create_effect_windows() {
 	dlgLevels.set_document(&document);
 	dlgPosterize.set_document(&document);
 	dlgThreshold.set_document(&document);
-	
+
 	dlgAddNoise.create(this);
 	dlgBulge.create(this);
 	dlgCrystalize.create(this);
 	dlgDespeckle.create(this);
 	dlgGain.create(this);
 	dlgGlow.create(this);
-	dlgGussianBlur.create(this);
+	dlgGaussianBlur.create(this);
 	dlgMarble.create(this);
 	dlgMedian.create(this);
 	dlgMotionBlur.create(this);
-	dlgOldPaint.create(this);
+	dlgOilPaint.create(this);
 	dlgOutline.create(this);
 	dlgPencilSketch.create(this);
 	dlgPixelate.create(this);
@@ -62,11 +61,11 @@ void UIContainer::create_effect_windows() {
 	dlgDespeckle.set_document(&doc);
 	dlgGain.set_document(&doc);
 	dlgGlow.set_document(&doc);
-	dlgGussianBlur.set_document(&doc);
+	dlgGaussianBlur.set_document(&doc);
 	dlgMarble.set_document(&doc);
 	dlgMedian.set_document(&doc);
 	dlgMotionBlur.set_document(&doc);
-	dlgOldPaint.set_document(&doc);
+	dlgOilPaint.set_document(&doc);
 	dlgOutline.set_document(&doc);
 	dlgPencilSketch.set_document(&doc);
 	dlgPixelate.set_document(&doc);
@@ -122,16 +121,14 @@ void UIContainer::on_init()
 	OUITheme::border.set(Color("#aaa"));
 	OUITheme::text.set(Color("#444"));
 
-	bCopyResult = false;
-	bApplyThreadRunning = false;
-	progressBlockCount = 100;
-	progress = 0.;
+	shouldCopyResult = false;
+	isRenderingDone = true;
 	currEffectDlg = NULL;
-	sw = 45;
+	sideBarWidth = 45;
 	int w = boxModel.width;
 	int h = boxModel.height;
-	sideView.create(0, 0, sw, h, this);
-	mainView.create(sw, 0, w - sw, h, this);
+	sideView.create(this);
+	mainView.create(this);
 	mainView.set_background_color(OUITheme::primary.bright(-20));
 	dlgCloseWithoutSave.create(300, 100, this, DialogButtonSet::Yes_No);
 	dlgCloseWithoutSave.set_title(L"Unsaved Changes");
@@ -207,7 +204,6 @@ void UIContainer::process_event(OUI* element, uint32_t message, uint64_t param, 
 	}
 	else if (message == UISIDE_CLOSE_DOCUMENT) {
 		dlgEffect->show();
-
 		//if (document.is_invalidated())
 		//	dlgCloseWithoutSave.show_window();
 		//else close_document(false);// this is guraranteed to close it because it is not invalidated i.e saved
@@ -236,7 +232,7 @@ void UIContainer::process_event(OUI* element, uint32_t message, uint64_t param, 
 				sideView.mZoom->set_zoom_info(zInfo);
 			}
 		}
-		else if (message == UIHISTO_UPDATE && !bApplyThreadRunning) {
+		else if (message == UIHISTO_UPDATE && isRenderingDone) {
 			auto low = param & 15;
 			auto high = param >> 4;
 			if (low == 1) document.undo();
@@ -261,8 +257,8 @@ void UIContainer::update_history_list() {
 void UIContainer::on_resize(int width, int height) {
 	int w = boxModel.width;
 	int h = boxModel.height;
-	sideView.move(0, 0, sw, h);
-	mainView.move(sw, 0, w - sw, h);
+	sideView.move(0, 0, sideBarWidth, h);
+	mainView.move(sideBarWidth, 0, w - sideBarWidth, h);
 	sideView.reset_size();
 }
 
@@ -282,15 +278,6 @@ void UIContainer::load(std::wstring filePath) {
 
 void UIContainer::update_image_dependant_elements() {
 	if (dlgEffect) dlgEffect->reset_image();
-
-	/*dlgContBright.reset_image();
-	dlgChannelMixer.reset_image();
-	dlgColorBalance.reset_image();
-	dlgCurves.reset_image();
-	dlgHSL.reset_image();
-	dlgLevels.reset_image();
-	dlgPosterize.reset_image();
-	dlgThreshold.reset_image();*/
 }
 
 void UIContainer::save(std::wstring filePath) {
@@ -316,13 +303,9 @@ void UIContainer::on_window_closed(UIWindow* window, size_t wmsg) {
 	}
 	else if (window == currEffectDlg) {
 		if (wmsg == DialogButtonId::OK) {
-			progress = 0.;
-			bCopyResult = true;
-			/*bApplyThreadRunning = true;
-			std::thread thread(&UIContainer::apply_thread, this);
-			thread.detach();
-			tempImage.free();
-			dlgProgress.show_window();*/
+			dlgProgress.set_progress(0.);
+			dlgProgress.show_window();
+			shouldCopyResult = true;
 			set_timer(1, 10);
 		}
 		else if (wmsg == DialogButtonId::Cancel) {
@@ -330,22 +313,28 @@ void UIContainer::on_window_closed(UIWindow* window, size_t wmsg) {
 		}
 		mainView.show_frame();
 	}
+	else if (window == &dlgProgress) {
+		if (wmsg == DialogButtonId::Cancel) {
+			shouldCopyResult = false;
+			currEffectDlg->cancel();
+		}
+	}
 }
 
 void UIContainer::on_timer(uint32_t nTimer) {
-	if (bUpdateProgress) {
-		dlgProgress.set_progress(progress);
-		bUpdateProgress = false;
-	}
+	isRenderingDone = currEffectDlg->is_rendering_done();
+	dlgProgress.set_progress(currEffectDlg->get_progress());
 
-	if (bApplyThreadRunning == false || bCopyResult) {
+	if (isRenderingDone) {
 		kill_timer(1);
-		dlgProgress.show_window(false);
-	}
-
-	if (bCopyResult) {
-		bCopyResult = false;
-		copy_result();
+		if (shouldCopyResult) {
+			dlgProgress.show_window(false);
+			copy_result(); 
+		}
+		else {
+			document.reset_frame();
+			mainView.show_frame();
+		}
 	}
 }
 
@@ -367,42 +356,42 @@ void UIContainer::invalidate_document() {
 	sideView.mSave->enable_element(0, document.is_open());
 }
 
-void UIContainer::apply_thread() {
-	if (currEffectDlg == NULL) return;
-
-	auto srcImage = document.get_image();
-	auto dstImage = &tempImage;
-
-	dstImage->clone(srcImage);
-
-	using namespace std::chrono_literals;
-	size_t verticalBlockIndex, horizontalBlockIndex;
-	int blockLeft, blockTop, blockRight, blockBottom, blockHeight;
-
-	blockHeight = int(ceil((double)srcImage->h / (double)progressBlockCount));
-	blockTop = 0;
-
-	// entire line
-	blockLeft = 0;
-	blockRight = srcImage->w;
-	auto progressBlockCount1 = progressBlockCount - 1;
-	bool wasSuccessful = true;
-
-	for (verticalBlockIndex = 0; verticalBlockIndex < progressBlockCount; ++verticalBlockIndex, blockTop += blockHeight) {
-		blockBottom = blockTop + blockHeight;
-		if (verticalBlockIndex == progressBlockCount1)
-			blockBottom = srcImage->h;
-
-		auto res = currEffectDlg->render(srcImage, dstImage, blockLeft, blockTop, blockRight, blockBottom);
-		if (res != IMAGE_EFFECT_RESULT_OK) {
-			if (res == IMAGE_EFFECT_RESULT_ERROR) wasSuccessful = false;
-			break;
-		}
-		
-		progress = (double)verticalBlockIndex / (double)(progressBlockCount1);
-		bUpdateProgress = true;
-	}
-
-	bCopyResult = wasSuccessful;
-	bApplyThreadRunning = false;
-}
+//void UIContainer::apply_thread() {
+//	if (currEffectDlg == NULL) return;
+//
+//	auto srcImage = document.get_image();
+//	auto dstImage = &tempImage;
+//
+//	dstImage->clone(srcImage);
+//
+//	using namespace std::chrono_literals;
+//	size_t verticalBlockIndex, horizontalBlockIndex;
+//	int blockLeft, blockTop, blockRight, blockBottom, blockHeight;
+//
+//	blockHeight = int(ceil((double)srcImage->h / (double)progressBlockCount));
+//	blockTop = 0;
+//
+//	// entire line
+//	blockLeft = 0;
+//	blockRight = srcImage->w;
+//	auto progressBlockCount1 = progressBlockCount - 1;
+//	bool wasSuccessful = true;
+//
+//	for (verticalBlockIndex = 0; verticalBlockIndex < progressBlockCount; ++verticalBlockIndex, blockTop += blockHeight) {
+//		blockBottom = blockTop + blockHeight;
+//		if (verticalBlockIndex == progressBlockCount1)
+//			blockBottom = srcImage->h;
+//
+//		auto res = currEffectDlg->render(srcImage, dstImage, blockLeft, blockTop, blockRight, blockBottom);
+//		if (res != IMAGE_EFFECT_RESULT_OK) {
+//			if (res == IMAGE_EFFECT_RESULT_ERROR) wasSuccessful = false;
+//			break;
+//		}
+//		
+//		progress = (double)verticalBlockIndex / (double)(progressBlockCount1);
+//		bUpdateProgress = true;
+//	}
+//
+//	bCopyResult = wasSuccessful;
+//	bApplyThreadRunning = false;
+//}

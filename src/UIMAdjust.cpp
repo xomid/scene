@@ -1,13 +1,7 @@
 #include "UIMAdjust.h"
-#include "Thumbnails_1.h"
 #include "Thumbnails_2.h"
 #include "UIButtonWithThumbnail.h"
 
-struct ItemInfo {
-	std::wstring title;
-	int id;
-	byte* thumbnailData;
-};
 
 void UIMAdjust::on_init() {
 	boxModel.width = 350;
@@ -27,7 +21,7 @@ void UIMAdjust::on_init() {
 		{ L"Levels ...", 0 , Thmb_Levels },
 		{ L"Negative", 0 , Thmb_Negative },
 		{ L"Posterize ...", 0 , Thmb_Posterize },
-		{ L"Threshold ...", 0 , Thmb_Thershold }
+		{ L"Threshold ...", 0 , Thmb_Threshold }
 	};
 
 	list.mode = UIStackMode::STACKHOR;

@@ -34,11 +34,11 @@ void UIDBulge::process_event(OUI* element, uint32_t message, uint64_t param, boo
 	if (element == &cAmount) {
 		amount = cAmount.get_value() / 100.;
 		cBulge.set_amount(amount);
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cBulge) {
 		shouldStretch = cBulge.is_stretched();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);

@@ -41,11 +41,11 @@ void UIDMedian::on_resize(int width, int height) {
 void UIDMedian::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cRadius) {
 		radius = (size_t)cRadius.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cPercentile) {
 		percentile = (size_t)cPercentile.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);

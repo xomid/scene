@@ -34,11 +34,11 @@ void UIDWater::on_resize(int width, int height) {
 void UIDWater::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cTelorance) {
 		telorance = (int)cTelorance.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cScale) {
 		scale = (int)cScale.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);

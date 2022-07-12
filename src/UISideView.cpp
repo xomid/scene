@@ -1,4 +1,5 @@
 #include "UISideView.h"
+#include <oui_uix.h>
 
 UISideView::UISideView()
 	: document(0) {
@@ -32,38 +33,40 @@ void UISideView::config_elements_based_on_document_status() {
 
 void UISideView::on_init() {
 
-	int l, t, bh, w, lh;
+	int l, t, bh, w, lh, lrMargin;
 	l = 0;
 	t = 7;
 	bh = 30;
 	lh = 5;
-
+	lrMargin = 7;
 	padding.set(t, 0, 0, 0);
 
-	Spacing margin;
-	margin.set(t, 0);
-	Color borderColor(Colors::lightgray);
+	Spacing margin; 
+	margin.set(lrMargin, 0);
 
 	w = boxModel.width - margin.left - margin.right;
 
-	btnOpen.create(l, t, w, bh, this);
-	btnSave.create(l, t, w, bh, this);
-	btnClose.create(l, t, w, bh, this);
-	sp1.create(l, t, w, lh, this);
-	btnAdj.create(l, t, w, bh, this);
-	btnFilter.create(l, t, w, bh, this);
-	sp2.create(l, t, w, lh, this);
-	btnUndo.create(l, t, w, bh, this);
-	btnRedo.create(l, t, w, bh, this);
-	btnHistory.create(l, t, w, bh, this);
-	sp3.create(l, t, w, lh, this);
-	btnZoom.create(l, t, w, bh, this);
-	btnInfo.create(l, t, w, bh, this);
+	btnOpen.create(this);
+	btnSave.create(this);
+	btnClose.create(this);
+	sp1.create(this);
+	btnAdj.create(this);
+	btnFilter.create(this);
+	sp2.create(this);
+	btnUndo.create(this);
+	btnRedo.create(this);
+	btnHistory.create(this);
+	sp3.create(this);
+	btnZoom.create(this);
+	btnInfo.create(this);
 
 	UIButtonWithBorderOnHover* btns[] = {
 		&btnOpen, &btnSave, &btnClose, &btnAdj, &btnFilter,
 		&btnUndo, &btnRedo, &btnHistory, &btnZoom, &btnInfo
 	};
+
+	Color borderColor(Colors::lightgray);
+	
 	iterateI(10) {
 		auto btn = btns[i];
 		btn->margin = margin;
@@ -71,6 +74,7 @@ void UISideView::on_init() {
 		btn->set_hover_border_color(borderColor);
 		btn->padding.set(5);
 	}
+
 	OUI* sps[] = { &sp1, &sp2, &sp3 };
 	iterateI(3) {
 		auto sp = sps[i];
@@ -80,6 +84,9 @@ void UISideView::on_init() {
 	}
 
 	reset_size();
+
+	//uix->show_magnifier(true, 200, 200, 10);
+	//uix->show_box_model();
 
 	Color rightBorderColor = backgroundColor.bright(-30);
 	border.set(0, 1, 0, 0,
@@ -207,6 +214,31 @@ void UISideView::process_event(OUI* element, uint32_t message, uint64_t param, b
 	}
 }
 
-void UISideView::on_update() {
-	UIStack::on_update();
+void UISideView::on_resize(int width, int height) {
+	int l, t, w, h, bh, lh, lrMargin;
+	l = 0;
+	t = 7;
+	bh = 30;
+	lh = 5;
+	lrMargin = 7;
+	 
+	Spacing margin;
+	margin.set(lrMargin, 0);
+	w = boxModel.width - margin.left - margin.right;
+
+	btnOpen.move(l, t, w, bh);
+	btnSave.move(l, t, w, bh);
+	btnClose.move(l, t, w, bh);
+	sp1.move(l, t, w, lh);
+	btnAdj.move(l, t, w, bh);
+	btnFilter.move(l, t, w, bh);
+	sp2.move(l, t, w, lh);
+	btnUndo.move(l, t, w, bh);
+	btnRedo.move(l, t, w, bh);
+	btnHistory.move(l, t, w, bh);
+	sp3.move(l, t, w, lh);
+	btnZoom.move(l, t, w, bh);
+	btnInfo.move(l, t, w, bh);
+
+	UIStack::on_resize(width, height);
 }

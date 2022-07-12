@@ -41,11 +41,11 @@ void UIDStamp::on_resize(int width, int height) {
 void UIDStamp::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cRadius) {
 		radius = (size_t)cRadius.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cThreshold) {
 		threshold = cThreshold.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);

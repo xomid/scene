@@ -43,17 +43,17 @@ void UIDMotionBlur::on_resize(int width, int height) {
 void UIDMotionBlur::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cSize) {
 		size = cSize.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &slAngle) {
 		angle = slAngle.get_value();
 		numAngle.set_value(angle);
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &numAngle) {
 		angle = atof(numAngle.get_number().c_str());
 		slAngle.set_value(angle);
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);

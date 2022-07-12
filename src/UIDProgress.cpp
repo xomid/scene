@@ -2,7 +2,7 @@
 
 void UIDProgress::create(int width, int height, OUI* caller) {
 	UIDialog::create(width, height, caller, DialogButtonSet::None);
-	show_buttons(false, false, false);
+	//show_buttons(false, false, false);
 }
 
 void UIDProgress::set_progress(double progress) {

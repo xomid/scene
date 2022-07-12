@@ -45,11 +45,11 @@ void UIDRipple::on_resize(int width, int height) {
 void UIDRipple::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cWaveLength) {
 		waveLength = (int)cWaveLength.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cAmplitude) {
 		amplitude = (int)cAmplitude.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &rdSinuous || element == &rdTriangle) {
 		if (message == Event::Select)
@@ -60,7 +60,7 @@ void UIDRipple::process_event(OUI* element, uint32_t message, uint64_t param, bo
 		else
 			rippleMode = RippleMode::Triangle;
 
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);

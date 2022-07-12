@@ -51,14 +51,14 @@ void UIDThreshold::on_resize(int width, int height) {
 void UIDThreshold::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cLevels) {
 		threshold = cLevels.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &chkMono) {
 		if (message == Event::Select || message == Event::Deselect) {
 			auto prevState = bMono;
 			chkMono.select(message == Event::Select);
 			bMono = chkMono.bSelected;
-			bInvalidate = bMono != prevState;
+			shouldInvalidate = bMono != prevState;
 		}
 	}
 	else {

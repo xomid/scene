@@ -20,14 +20,14 @@ void UIDEffect::create(OUI* caller) {
 
 	set_title(L"Effect");
 	document = NULL;
-	bInvalidate = false;
-	bUpdateView = false;
-	bViewUpdated = false;
-	bTerminate = false;
-	bRenderThreadRunning = false;
-	bCompleteRendering = false;
+	shouldInvalidate = false;
+	shouldUpdateView = false;
+	isViewUpdated = false;
+	shouldTerminate = false;
+	isRenderThreadRunning = false;
+	shouldCompleteRendering = false;
 
-	chkPreview.select(bPreview = true);
+	chkPreview.select(shouldPreview = true);
 
 	chkPreview.create(10, 10, 80, 20, this);
 	chkPreview.set_text(L"Preview");
@@ -42,9 +42,9 @@ void UIDEffect::on_resize(int width, int height) {
 void UIDEffect::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &chkPreview && (message == Event::Select || message == Event::Deselect)) {
 		chkPreview.select(message == Event::Select);
-		bPreview = chkPreview.bSelected;
-		bInvalidate = bPreview;
-		parent->process_event(this, Event::Click, bPreview, true);
+		shouldPreview = chkPreview.bSelected;
+		shouldInvalidate = shouldPreview;
+		parent->process_event(this, Event::Click, shouldPreview, true);
 	}
 	UIDialog::process_event(element, message, param, bubbleUp);
 }
@@ -59,9 +59,17 @@ void UIDEffect::cancel() {
 }
 
 void UIDEffect::stop_render_thread() {
-	bTerminate = true;
-	while (bRenderThreadRunning) {
+	shouldTerminate = true;
+	while (isRenderThreadRunning) {
 	}
+}
+
+bool UIDEffect::is_rendering_done() const {
+	return !isRenderThreadRunning;
+}
+
+double UIDEffect::get_progress() const {
+	return progress;
 }
 
 void UIDEffect::close(uint32_t wmsg) {
@@ -69,17 +77,12 @@ void UIDEffect::close(uint32_t wmsg) {
 
 	if (wmsg == DialogButtonId::Cancel) {
 		cancel();
+		UIDialog::close(wmsg);
 	}
 	else {
-		int y = 0;
-		bCompleteRendering = true;
-		while (bCompleteRendering) {
-			bUpdateView = false;
-			++y;
-		}
+		shouldCompleteRendering = true;
+		UIDialog::close(wmsg);
 	}
-
-	UIDialog::close(wmsg);
 }
 
 void UIDEffect::show(bool bShow) {
@@ -88,18 +91,18 @@ void UIDEffect::show(bool bShow) {
 	}
 	else {
 		chkPreview.select(true);
-		if (!bRenderThreadRunning) {
-			bRenderThreadRunning = true;
-			bCompleteRendering = false;
-			bTerminate = false;
-			bInvalidate = true;
+		if (!isRenderThreadRunning) {
+			isRenderThreadRunning = true;
+			shouldCompleteRendering = false;
+			shouldTerminate = false;
+			shouldInvalidate = true;
 			std::thread thread(&UIDEffect::render_thread, this);
 			thread.detach();
 		}
 		else {
-			bCompleteRendering = false;
-			bTerminate = false;
-			bInvalidate = true;
+			shouldCompleteRendering = false;
+			shouldTerminate = false;
+			shouldInvalidate = true;
 		}
 	}
 
@@ -108,7 +111,12 @@ void UIDEffect::show(bool bShow) {
 }
 
 void UIDEffect::wait_for_painting() {
-	while (bUpdateView && !bTerminate) {
+	volatile int t = 0;
+	while (shouldUpdateView && !shouldTerminate && !shouldCompleteRendering) {
+		t = t * 2 - 3; 
+		// this is done so compiler doenst accidentally optimize away this loop
+		// the purpose of this loop is to wait until the view is updated before 
+		// rendering the next block
 	}
 }
 
@@ -116,11 +124,11 @@ void UIDEffect::render_thread() {
 
 	bool isDone = false;
 
-	while (bRenderThreadRunning) {
+	while (isRenderThreadRunning) {
 
 		using namespace std::chrono_literals;
-		if (bInvalidate) {
-			bInvalidate = false;
+		if (shouldInvalidate) {
+			shouldInvalidate = false;
 
 			if (document) {
 
@@ -137,6 +145,8 @@ void UIDEffect::render_thread() {
 				blockHeight = int(ceil((double)srcImage->h / (double)verticalBlockCount));
 				blockTop = 0;
 				isDone = false;
+				double blockMax = double(verticalBlockCount * horizontalBlockCount - 1);
+				double blockIndex = 0;
 
 				for (verticalBlockIndex = 0; verticalBlockIndex < verticalBlockCount && !isDone; ++verticalBlockIndex, blockTop += blockHeight) {
 					blockBottom = blockTop + blockHeight;
@@ -152,59 +162,60 @@ void UIDEffect::render_thread() {
 
 						wait_for_painting();
 
-						if (bInvalidate || bTerminate)
+						if (shouldInvalidate || shouldTerminate)
 							break;
 
 						auto res = render(srcImage, dstImage, blockLeft, blockTop, blockRight, blockBottom);
 						if (res == IMAGE_EFFECT_RESULT_ERROR || res == IMAGE_EFFECT_RESULT_WHOLE_IMAGE) {
 							isDone = true;
 							if (res == IMAGE_EFFECT_RESULT_ERROR)
-								bRenderThreadRunning = false;
+								isRenderThreadRunning = false;
 						}
 
-						bUpdateView = true;
+						progress = fmin(++blockIndex / blockMax, 1.);
+						shouldUpdateView = true;
 
-						if (bInvalidate || bTerminate)
+						if (shouldInvalidate || shouldTerminate)
 							break;
 					}
 
-					if (bInvalidate || bTerminate)
+					if (shouldInvalidate || shouldTerminate)
 						break;
 				}
 
-				if (isDone) bInvalidate = false;
+				if (isDone) shouldInvalidate = false;
 			}
 		}
 
-		if (bTerminate)
+		if (shouldTerminate)
 			break;
 
-		if (bCompleteRendering && !bInvalidate) {
-			bCompleteRendering = false;
+		if (shouldCompleteRendering && !shouldInvalidate) {
+			shouldCompleteRendering = false;
 			break;
 		}
 	}
 
-	bRenderThreadRunning = false;
+	isRenderThreadRunning = false;
 }
 
 void UIDEffect::on_timer(uint32_t nTimer) {
 
-	// bViewUpdated means that the actual paiting on the screen has been done so 
+	// isViewUpdated means that the actual paiting on the screen has been done so 
 	// we signal the thread to continue;
-	if (bViewUpdated) {
-		bUpdateView = false;
-		bViewUpdated = false;
+	if (isViewUpdated) {
+		shouldUpdateView = false;
+		isViewUpdated = false;
 		return;
 	}
 
 	// first, thread will set this to true to invalidate the MainView
-	// and set the flag bViewUpdated to true so when the next
+	// and set the flag isViewUpdated to true so when the next
 	// timer callback is called we know that we were done paiting 
 	// and should signal the image processing thread to continue to next block or reset rendering again
-	if (bUpdateView) {
+	if (shouldUpdateView) {
 		invalidate();
-		bViewUpdated = true;
+		isViewUpdated = true;
 		if (parent) parent->process_event(this, UIDEFFECT_UPDATE, 0, true);
 	}
 }

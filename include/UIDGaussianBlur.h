@@ -2,7 +2,7 @@
 #include "UIDEffect.h"
 #include "UIComplexS.h"
 
-class UIDGussianBlur : public UIDEffect
+class UIDGaussianBlur : public UIDEffect
 {
 	UIComplexS cRadius;
 	size_t radius;

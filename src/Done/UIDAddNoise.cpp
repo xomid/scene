@@ -52,20 +52,20 @@ void UIDAddNoise::on_resize(int width, int height) {
 void UIDAddNoise::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cAmount) {
 		amount = cAmount.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &rdGussian || element == &rdUniform) {
 		if (message == Event::Select) {
 			element->select(true);
 			if (rdGussian.bSelected) noiseType = NoiseType::Gussian;
 			else noiseType = NoiseType::Gussian;
-			bInvalidate = true;
+			shouldInvalidate = true;
 		}
 	}
 	else if (element == &chkMono) {
 		chkMono.select(message == Event::Select);
 		bMono = chkMono.bSelected;
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);

@@ -10,6 +10,12 @@ void UIButtonWithMenu::on_init() {
 	bOn = false;
 }
 
+void UIButtonWithMenu::on_resize(int width, int height) {
+	UIButton::on_resize(width, height);
+	if (menu) menu->move(boxModel.left + boxModel.width + 2, 0, 
+		menu->boxModel.width, menu->boxModel.height);
+}
+
 void UIButtonWithMenu::on_update() {
 	UIButtonWithBorderOnHover::on_update();
 	int l, t, w, h, m;
@@ -25,14 +31,12 @@ void UIButtonWithMenu::set_menu(UIMenu* menu) {
 	this->menu = menu;
 	menu->menuActivationMode = MenuActivationMode::PointerDown;
 	menu->menuType = MenuType::Solid;
-	menu->set_background_color(Colors::purple);
+	menu->set_background_color(backgroundColor);
 	menu->border.set(1, Colors::lightgray);
 	menu->borderRadius.set(5);
 	menu->create(30, 0, 0, 0, this);
-	menu->move(boxModel.left + boxModel.width + 2, 0, 
-		menu->boxModel.width, menu->boxModel.height);
-	menu->add_box_shadow(false, 2, 2, 4, 2, 
-		Color("rgb(0, 0, 0, 0.1)"));
+	menu->move(boxModel.left + boxModel.width + 2, 0, menu->boxModel.width, menu->boxModel.height);
+	menu->add_box_shadow(false, 2, 2, 4, 2, Color("rgb(0, 0, 0, 0.1)"));
 }
 
 void UIButtonWithMenu::on_mouse_down(int x, int y, uint32_t flags) {
@@ -42,7 +46,7 @@ void UIButtonWithMenu::on_mouse_down(int x, int y, uint32_t flags) {
 	UIButton::on_mouse_down(x, y, flags);
 	if (bOn) {
 		bOn = false;
-		menu->fade();
+		menu->fade(); 
 	}
 	else {
 		bOn = true;

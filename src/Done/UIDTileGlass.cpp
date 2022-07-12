@@ -48,21 +48,21 @@ void UIDTileGlass::on_resize(int width, int height) {
 void UIDTileGlass::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cSize) {
 		size = (int)cSize.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cAmount) {
 		amount = (int)cAmount.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &slAngle) {
 		angle = (int)slAngle.get_value();
 		numAngle.set_value((double)angle);
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &numAngle) {
 		angle = (int)atof(numAngle.get_number().c_str());
 		slAngle.set_value((double)angle);
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);

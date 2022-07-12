@@ -34,11 +34,11 @@ void UIDSwirl::process_event(OUI* element, uint32_t message, uint64_t param, boo
 	if (element == &cAngle) {
 		angle = cAngle.get_value();
 		cSwirl.set_angle(angle);
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cSwirl) {
 		shouldStretch = cSwirl.is_stretched();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);

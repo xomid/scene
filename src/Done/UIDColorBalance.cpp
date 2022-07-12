@@ -65,22 +65,22 @@ void UIDColorBalance::on_resize(int width, int height) {
 void UIDColorBalance::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cRed) {
 		red = cRed.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cGreen) {
 		green = cGreen.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cBlue) {
 		blue = cBlue.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &chkPreserveLum) {
 		if (message == Event::Select || message == Event::Deselect) {
 			auto prevState = bPreserveLum;
 			chkPreserveLum.select(message == Event::Select);
 			bPreserveLum = chkPreserveLum.bSelected;
-			bInvalidate = bPreserveLum != prevState;
+			shouldInvalidate = bPreserveLum != prevState;
 		}
 	}
 	else {

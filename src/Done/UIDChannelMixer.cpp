@@ -199,7 +199,7 @@ void UIDChannelMixer::load_preset(size_t index) {
 	cGreen.set_value(gray.green * 100.);
 	cBlue.set_value(gray.blue * 100.);
 
-	bInvalidate = true;
+	shouldInvalidate = true;
 }
 
 void UIDChannelMixer::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
@@ -212,20 +212,20 @@ void UIDChannelMixer::process_event(OUI* element, uint32_t message, uint64_t par
 
 		if (element == &cRed) {
 			currChannelInfo->red = cRed.get_value() / 100.;
-			bInvalidate = true;
+			shouldInvalidate = true;
 		}
 		else if (element == &cGreen) {
 			currChannelInfo->green = cGreen.get_value() / 100.;
-			bInvalidate = true;
+			shouldInvalidate = true;
 		}
 		else if (element == &cBlue) {
 			currChannelInfo->blue = cBlue.get_value() / 100.;
-			bInvalidate = true;
+			shouldInvalidate = true;
 		}
 	}
 	else if (element == &selPreset) {
 		load_preset(selPreset.get_selected_option_index());
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &chkMono || element == &chkPreserveLum) {
 		if (message == Event::Select || message == Event::Deselect) {
@@ -233,7 +233,7 @@ void UIDChannelMixer::process_event(OUI* element, uint32_t message, uint64_t par
 				auto prevState = isMonochromatic;
 				chkMono.select(message == Event::Select);
 				isMonochromatic = chkMono.bSelected;
-				bInvalidate = isMonochromatic != prevState;
+				shouldInvalidate = isMonochromatic != prevState;
 				if (bInvalidate)
 					reset_output_channel_menu();
 				load_preset(7);
@@ -242,7 +242,7 @@ void UIDChannelMixer::process_event(OUI* element, uint32_t message, uint64_t par
 				auto prevState = shouldPreserveLum;
 				chkPreserveLum.select(message == Event::Select);
 				shouldPreserveLum = chkPreserveLum.bSelected;
-				bInvalidate = shouldPreserveLum != prevState;
+				shouldInvalidate = shouldPreserveLum != prevState;
 			}
 		}
 	}

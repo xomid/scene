@@ -34,11 +34,11 @@ void UIDWave::on_resize(int width, int height) {
 void UIDWave::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cWaveLength) {
 		waveLength = cWaveLength.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cAmplitude) {
 		amplitude = cAmplitude.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);

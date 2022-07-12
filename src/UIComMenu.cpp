@@ -24,12 +24,10 @@ void UIComMenu::on_init() {
 	lblTitle.padding.set(10, 0);
 }
 
-void UIComMenu::on_update() {
-	OUI::on_update();
-}
-
-void UIComMenu::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
-	UIMenu::process_event(element, message, param, bubbleUp);
+void UIComMenu::apply_theme(bool shouldInvalidate) {
+	set_background_color(OUITheme::primary);
+	set_color(OUITheme::text);
+	if (shouldInvalidate) invalidate();
 }
 
 void UIComMenu::on_resize(int width, int height) {
@@ -41,5 +39,4 @@ void UIComMenu::on_resize(int width, int height) {
 }
 
 void UIComMenu::enable_element(uint32_t index, bool enable) {
-
 }

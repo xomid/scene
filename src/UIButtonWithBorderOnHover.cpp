@@ -22,6 +22,7 @@ void UIButtonWithBorderOnHover::hover(bool bHover) {
 	else {
 		border.set(1, backgroundColor);
 	}
+	invalidate();
 }
 
 void UIButtonWithBorderOnHover::set_hover_border_color(Color color) {

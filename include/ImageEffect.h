@@ -370,7 +370,7 @@ public:
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// radius [0, 254]
-	static int gussian_blur(Sheet* srcImage, Sheet* dstImage, size_t radius,
+	static int gaussian_blur(Sheet* srcImage, Sheet* dstImage, size_t radius,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// gian, bias [0, 1]
@@ -404,7 +404,7 @@ public:
 
 	// brushSize [1, 100]
 	// coareness [3, 255]
-	static int old_paint(Sheet* srcImage, Sheet* dstImage, OldPaintBlob* blob, size_t brushSize, size_t coareness,
+	static int oil_paint(Sheet* srcImage, Sheet* dstImage, OldPaintBlob* blob, size_t brushSize, size_t coareness,
 		int blockLeft, int blockTop, int blockRight, int blockBottom);
 
 	// radius [1, 200]

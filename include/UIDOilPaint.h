@@ -2,7 +2,7 @@
 #include "UIDEffect.h"
 #include "UIComplexS.h"
 
-class UIDOldPaint : public UIDEffect
+class UIDOilPaint : public UIDEffect
 {
 	UIComplexS cBrushSize, cCoareness;
 	size_t brushSize, coareness;

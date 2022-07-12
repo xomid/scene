@@ -70,19 +70,19 @@ void UIDSmear::process_event(OUI* element, uint32_t message, uint64_t param, boo
 			smearMode = SmearMode::Crosses;
 			break;
 		}
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cAmount) {
 		amount = (int)cAmount.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cMix) {
 		mix = cMix.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cDensity) {
 		density = cDensity.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);

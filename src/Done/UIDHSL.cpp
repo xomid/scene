@@ -104,15 +104,15 @@ void UIDHSL::process_event(OUI* element, uint32_t message, uint64_t param, bool 
 
 		if (element == &cHue) {
 			hsl.hue = cHue.get_value();
-			bInvalidate = true;
+			shouldInvalidate = true;
 		}
 		else if (element == &cSaturation) {
 			hsl.saturation = cSaturation.get_value();
-			bInvalidate = true;
+			shouldInvalidate = true;
 		}
 		else if (element == &cLightness) {
 			hsl.lightness = cLightness.get_value();
-			bInvalidate = true;
+			shouldInvalidate = true;
 		}
 		else if (element == &chkColorize) {
 			if (message == Event::Select || message == Event::Deselect) {
@@ -120,7 +120,7 @@ void UIDHSL::process_event(OUI* element, uint32_t message, uint64_t param, bool 
 				chkColorize.select(message == Event::Select);
 				shouldColorize = chkColorize.bSelected;
 				colorize();
-				bInvalidate = shouldColorize != prevState;
+				shouldInvalidate = shouldColorize != prevState;
 			}
 		}
 		else {
@@ -156,7 +156,7 @@ void UIDHSL::colorize() {
 		cSaturation.config((double)hsl.saturation, 1., -100., 100., 60);
 	}
 
-	bInvalidate = true;
+	shouldInvalidate = true;
 }
 
 void UIDHSL::load_preset(size_t presetId) {
@@ -225,6 +225,6 @@ void UIDHSL::load_preset(size_t presetId) {
 
 		cLightness.config((double)hsl.lightness, 1., -100., 100., 60);
 
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 }

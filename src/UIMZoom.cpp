@@ -37,19 +37,18 @@ void UIMZoom::on_init() {
 	int fs = 20;
 	btnUp.set_font_size(fs);
 	btnDown.set_font_size(fs);
-
-	padding.set(0, 10, 10);
 }
 
 void UIMZoom::on_resize(int width, int height) {
 	OUI::get_content_area(contentArea);
-	int w = contentArea.width;
+	int t = lblTitle.contentArea.bottom() + 10;
+	int l = 10;
+	int w = contentArea.width - 2 * l;
 	int h = contentArea.height;
 	int b = h;
-	int t = lblTitle.contentArea.bottom() + 10;
-	int l = 0;
 	int vh, vw;
 	int m = 10;
+	int r = l + w;
 
 	vh = 20;
 	slide.move(l, b - vh, w, vh);
@@ -60,12 +59,12 @@ void UIMZoom::on_resize(int width, int height) {
 	t = t - vh;
 
 	btnDown.move(l, t, vw, vh);
-	btnUp.move(w - vw, t, vw, vh);
+	btnUp.move(r - vw, t, vw, vh);
 
 	int lblW = 12;
 	int txtW = Min(80, (w - 2 * btnUp.boxModel.width - 2 - lblW));
-	lblPercent.move((w - lblW - txtW) / 2 + txtW + m, t, lblW, vh);
-	numScale.move((w - lblW - txtW) / 2, t, txtW, vh);
+	lblPercent.move((r - lblW - txtW) / 2 + txtW + m, t, lblW, vh);
+	numScale.move((r - lblW - txtW) / 2, t, txtW, vh);
 
 	vh = t - m;
 	t = lblTitle.contentArea.bottom() + 10;

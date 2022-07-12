@@ -17,7 +17,8 @@ protected:
 	static size_t verticalBlockCount, horizontalBlockCount;
 	UICheck chkPreview;
 	Document* document;
-	bool bPreview, bRenderThreadRunning, bInvalidate, bTerminate, bUpdateView, bViewUpdated, bCompleteRendering;
+	bool shouldPreview, isRenderThreadRunning, shouldInvalidate, shouldTerminate, shouldUpdateView, isViewUpdated, shouldCompleteRendering;
+	double progress;
 
 	// this is a dummy function and is used so that compiler 
 	// doesnt optimize away an empty useless while loop
@@ -33,6 +34,8 @@ public:
 	void create(OUI* caller);
 	void on_timer(uint32_t nTimer) override;
 
+	virtual double get_progress() const;
+	virtual bool is_rendering_done() const;
 	virtual void reset_image();
 	virtual void set_document(Document* document);
 	virtual void show(bool bShow = true);

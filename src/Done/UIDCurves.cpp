@@ -125,14 +125,14 @@ void UIDCurves::process_event(OUI* element, uint32_t message, uint64_t param, bo
 	if (element == &cCurve) {
 		calc_lookup_tables();
 		selPreset.select_option(10);
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &selPreset) {
 		if (message == Event::Update) {
 			int presetId = selPreset.get_selected_option_index();
 			load_preset((size_t)presetId);
 			calc_lookup_tables();
-			bInvalidate = true;
+			shouldInvalidate = true;
 		}
 	}
 	else if (element == &selChannel) {
@@ -152,7 +152,7 @@ void UIDCurves::process_event(OUI* element, uint32_t message, uint64_t param, bo
 		}
 
 		cCurve.set_channel(c);
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &rdCurve || element == &rdPoint) {
 		if (message == Event::Select) {
@@ -160,7 +160,7 @@ void UIDCurves::process_event(OUI* element, uint32_t message, uint64_t param, bo
 			element->select(true);
 			bCurve = rdCurve.bSelected;
 			cCurve.set_type(rdCurve.bSelected ? CurveType::Spline : CurveType::Point);
-			bInvalidate = bCurve != prevState;
+			shouldInvalidate = bCurve != prevState;
 		}
 	}
 	else {
@@ -179,7 +179,7 @@ void UIDCurves::calc_lookup_tables() {
 	memcpy(blob->green, greenLookup, 256);
 	memcpy(blob->blue, blueLookup, 256);
 
-	bInvalidate = true;
+	shouldInvalidate = true;
 }
 
 int UIDCurves::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
@@ -300,5 +300,5 @@ void UIDCurves::load_preset(size_t presetId)
 	}
 
 	cCurve.set_type(CurveType::Spline);
-	bInvalidate = true;
+	shouldInvalidate = true;
 }

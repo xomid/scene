@@ -46,15 +46,15 @@ void UIDGlow::on_resize(int width, int height) {
 void UIDGlow::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cSoftness) {
 		softness = cSoftness.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cBrightness) {
 		brightness = cBrightness.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cContrast) {
 		contrast = cContrast.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);

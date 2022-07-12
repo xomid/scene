@@ -41,11 +41,11 @@ void UIDPencilSketch::on_resize(int width, int height) {
 void UIDPencilSketch::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cBrushSize) {
 		brushSize = (size_t)cBrushSize.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &cRange) {
 		range = (int)cRange.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);

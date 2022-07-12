@@ -191,7 +191,7 @@ void UIDLevels::process_event(OUI* element, uint32_t message, uint64_t param, bo
 		currentChannelInfo->outputMax = slOutput.get_value(1);
 		if (currentChannelInfo != &rgbInfo) currentChannelInfo->fill_lookup(&rgbInfo);
 
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);
@@ -276,7 +276,7 @@ void UIDLevels::load_preset(size_t presetId) {
 	slOutput.set_value(0, currentChannelInfo->outputMin);
 	slOutput.set_value(1, currentChannelInfo->outputMax);
 
-	bInvalidate = true;
+	shouldInvalidate = true;
 }
 
 int UIDLevels::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)

@@ -59,7 +59,7 @@ void UIDRadialBlur::process_event(OUI* element, uint32_t message, uint64_t param
 	if (element == &cAmount) {
 		amount = cAmount.get_value();
 		cBlur.set_amount(amount);
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &rdSpin || element == &rdZoom) {
 		if (message == Event::Select) {
@@ -68,12 +68,12 @@ void UIDRadialBlur::process_event(OUI* element, uint32_t message, uint64_t param
 			if (rdZoom.bSelected)
 				blurMode = RadialBlurMode::Zoom;
 			cBlur.set_blur_mode(blurMode);
-			bInvalidate = true;
+			shouldInvalidate = true;
 		}
 	}
 	else if (element == &cBlur) {
 		cBlur.get_pivot_point(cx, cy);
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);

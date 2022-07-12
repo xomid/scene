@@ -1,20 +1,20 @@
-#include "UIDGussianBlur.h"
+#include "UIDGaussianBlur.h"
 #include "ImageEffect.h"
 
-void UIDGussianBlur::measure_size(int* width, int* height) {
+void UIDGaussianBlur::measure_size(int* width, int* height) {
 	if (width) *width = 320;
 	if (height) *height = 115;
 }
 
-void UIDGussianBlur::on_init() {
-	set_title(L"Gussian Blur");
+void UIDGaussianBlur::on_init() {
+	set_title(L"Gaussian Blur");
 	cRadius.create(this);
 	cRadius.set_text(L"Radius");
 	radius = 0;
 	cRadius.config((double)radius, 1., 0., 254., 60);
 }
 
-void UIDGussianBlur::on_resize(int width, int height) {
+void UIDGaussianBlur::on_resize(int width, int height) {
 	UIDEffect::on_resize(width, height);
 
 	int w, h, l, t, bottomMargin;
@@ -26,18 +26,18 @@ void UIDGussianBlur::on_resize(int width, int height) {
 	cRadius.move(l, t, w, h);
 }
 
-void UIDGussianBlur::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
+void UIDGaussianBlur::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cRadius) {
 		radius = (size_t)cRadius.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else {
 		UIDEffect::process_event(element, message, param, bubbleUp);
 	}
 }
 
-int UIDGussianBlur::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDGaussianBlur::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	return ImageEffect::gussian_blur(srcImage, dstImage, radius,
+	return ImageEffect::gaussian_blur(srcImage, dstImage, radius,
 		blockLeft, blockTop, blockRight, blockBottom);
 }

@@ -49,11 +49,11 @@ void UIDContBright::on_resize(int width, int height) {
 void UIDContBright::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &scBright) {
 		brightness = scBright.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &scContst) {
 		contrast = scContst.get_value();
-		bInvalidate = true;
+		shouldInvalidate = true;
 	}
 	else if (element == &chkLegacy) {
 		if (message == Event::Select || message == Event::Deselect) {
@@ -69,7 +69,7 @@ void UIDContBright::process_event(OUI* element, uint32_t message, uint64_t param
 				scContst.config(scContst.get_value(), 1, -50, 100, 60);
 			}
 
-			bInvalidate = bLegacy != prevState;
+			shouldInvalidate = bLegacy != prevState;
 		}
 	}
 	else {

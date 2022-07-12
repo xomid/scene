@@ -22,11 +22,11 @@
 #include "UIDDespeckle.h"
 #include "UIDGain.h"
 #include "UIDGlow.h"
-#include "UIDGussianBlur.h"
+#include "UIDGaussianBlur.h"
 #include "UIDMarble.h"
 #include "UIDMedian.h"
 #include "UIDMotionBlur.h"
-#include "UIDOldPaint.h"
+#include "UIDOilPaint.h"
 #include "UIDOutline.h"
 #include "UIDPencilSketch.h"
 #include "UIDPixelate.h"
@@ -60,11 +60,11 @@ class UIContainer : public OUI
 	UIDDespeckle dlgDespeckle;
 	UIDGain dlgGain;
 	UIDGlow dlgGlow;
-	UIDGussianBlur dlgGussianBlur;
+	UIDGaussianBlur dlgGaussianBlur;
 	UIDMarble dlgMarble;
 	UIDMedian dlgMedian;
 	UIDMotionBlur dlgMotionBlur;
-	UIDOldPaint dlgOldPaint;
+	UIDOilPaint dlgOilPaint;
 	UIDOutline dlgOutline;
 	UIDPencilSketch dlgPencilSketch;
 	UIDPixelate dlgPixelate;
@@ -91,13 +91,10 @@ class UIContainer : public OUI
 	UIDThreshold dlgThreshold;*/
 
 	UIDEffect* currEffectDlg;
-
 	std::vector<FileDialogFileType> fileTypes;
-	int sw;
 	Sheet tempImage;
-	double progress;
-	size_t progressBlockCount;
-	bool bUpdateProgress, bApplyThreadRunning, bCopyResult;
+	bool shouldCopyResult, isRenderingDone;
+	int sideBarWidth;
 
 	void apply_thread();
 	void copy_result();
