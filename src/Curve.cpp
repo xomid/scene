@@ -6,7 +6,7 @@ void Curve::Stretch(int newrange)
 	range = int(range * s + 0.5);
 	int ra = range - 1;
 
-	for (int i = nCount - 1; i >= 0; i--)
+	for (int i = (int)nCount - 1; i >= 0; i--)
 	{
 		xs[i] = Min(Max(int(xs[i] * s + 0.5), 0), ra);
 		ys[i] = Min(Max(int(ys[i] * s + 0.5), 0), ra);
@@ -46,18 +46,20 @@ void Curve::ConvertTo(int mode)
 
 		if (bIntact)
 		{
-			int val, d1, d2, lx, ly;
-			erase(1, nCount - 2);
-			lx = 0;
+			int d1, d2, lx, ly;
+			erase(1, (int)nCount - 2);
 			xs[0] = 0;
 			xs[1] = range - 1.0;
-			ly = ys[0] = points_lookup[0];
+			ys[0] = points_lookup[0];
 			ys[1] = points_lookup[range - 1];
+
+			lx = 0;
+			ly = (int)ys[0];
 
 			for (i = 3; i < range - 12; i += 2)
 			{
-				d1 = (points_lookup[i] - ly) / (double)(i - lx) * 100;
-				d2 = (points_lookup[i + 10] - points_lookup[i]) * 10;
+				d1 = (int)((points_lookup[i] - (double)ly) / (double)(i - lx) * 100.);
+				d2 = (int)((points_lookup[i + 10] - points_lookup[i]) * 10.);
 				d1 = abs(d2 - d1);
 
 				if (d1 > 10)
@@ -77,23 +79,23 @@ void Curve::ConvertTo(int mode)
 		double t, y;
 		ra = range - 1;
 
-		minx = xs[0];
-		maxx = xs[nCount - 1];
+		minx = int(xs[0]);
+		maxx = int(xs[nCount - 1]);
 
 		memset(points_lookup, 0, sizeof(points_lookup));
 
 		for (i = minx; i <= maxx; i++)
 		{
-			t = i;
-			points_lookup[i] = Min(Max(evalSpline(t), 0), ra);
+			t = (double)i;
+			points_lookup[i] = fmin(fmax(evalSpline(t), 0), (double)ra);
 		}
 
-		y = Min(Max(ys[0], 0), 255);
+		y = fmin(fmax(ys[0], 0.), 255.);
 
 		for (i = 0; i < minx; i++)
 			points_lookup[i] = y;
 
-		y = Min(Max(ys[nCount - 1], 0), ra);
+		y = fmin(fmax(ys[nCount - 1], 0.), (double)ra);
 		for (i = maxx + 1; i < 256; i++)
 			points_lookup[i] = y;
 	}
@@ -110,8 +112,8 @@ void Curve::FillLookUp()
 		double s = (range - 1) / 255.0,
 			s2 = 255.0 / ra, t;
 
-		minx = xs[0] * s2;
-		maxx = xs[nCount - 1] * s2;
+		minx = (int)(xs[0] * s2);
+		maxx = (int)(xs[nCount - 1] * s2);
 
 		memset(value_lookup, 0, 256);
 
@@ -131,19 +133,19 @@ void Curve::FillLookUp()
 	}
 	else
 	{
-		int i, y, minx, maxx, ra, t;
+		int i, ra, t;
 		ra = range - 1;
 		if (ra > 255) return;
 
-		double s = ra / 255.0,
-			s2 = 255.0 / ra;
+		double s = (double)ra / 255.0,
+			s2 = 255.0 / (double)ra;
 
 		memset(value_lookup, 0, 256);
 
 		for (i = 0; i < 256; i++)
 		{
-			t = i * s;
-			value_lookup[i] = 255 - Min(int(Max(Min(points_lookup[t], ra), 0) * s2 + 0.5), 255);
+			t = (int)((double)i * s);
+			value_lookup[i] = 255 - Min(int(Max(Min(points_lookup[t], (double)ra), 0) * s2 + 0.5), 255);
 		}
 	}
 }
@@ -173,7 +175,7 @@ void Curve::solve(double **A, int len)
 	for (int k = 0; k<m; k++)
 	{
 		int i_max = 0;
-		int vali = 0;
+		double vali = 0;
 		bool bFirst = true;
 
 		for (int i = k; i<m; i++)
@@ -213,8 +215,8 @@ void Curve::solve(double **A, int len)
 }
 void Curve::getNaturalKs()	// in x values, in y values, out k values
 {
-	if (nCount < 1) return;
-	int n = nCount - 1;
+	if (nCount == 0) return;
+	int n = (int)nCount - 1;
 	double **A = zerosMat(n + 1, n + 2);
 
 	for (int i = 1; i<n; i++)	// rows
@@ -238,7 +240,8 @@ void Curve::getNaturalKs()	// in x values, in y values, out k values
 
 	solve(A, (n + 1));
 }
-int  Curve::evalSpline(int x)
+
+int Curve::evalSpline(int x)
 {
 	int i = 1;
 	while (xs[i]<x) i++;
@@ -249,8 +252,9 @@ int  Curve::evalSpline(int x)
 	double b = -ks[i] * (xs[i] - xs[i - 1]) + (ys[i] - ys[i - 1]);
 
 	double q = (1 - t)*ys[i - 1] + t*ys[i] + t*(1 - t)*(a*(1 - t) + b*t);
-	return q + 0.5;
+	return int(q + 0.5);
 }
+
 double Curve::evalSpline(double x)
 {
 	int i = 1;
@@ -287,7 +291,7 @@ void Curve::Sort()
 		}
 	}
 }
-int  Curve::Add(int x, int y)
+int Curve::Add(int x, int y)
 {
 	ks.push_back(1.0);
 	ys.push_back(y);
@@ -295,8 +299,11 @@ int  Curve::Add(int x, int y)
 	nCount = ks.size();
 	Sort();
 
-	for (int i = 0; i < nCount; i++)
-	if (xs[i] == x) return i;
+	for (size_t i = 0; i < nCount; i++)
+		if (xs[i] == x) 
+			return (int)i;
+
+	return 0;
 }
 void Curve::Remove(int nIndex)
 {
@@ -312,8 +319,8 @@ void Curve::erase(int iIndex, int iCount)
 	if (iCount < 1) return;
 
 	s = iIndex != -1 ? iIndex : 0;
-	e = iCount != -1 ? s + iCount : nCount - 1;
-	e = e > nCount ? nCount - 1 : e;
+	e = iCount != -1 ? s + iCount : (int)nCount - 1;
+	e = e > (int)nCount ? (int)nCount - 1 : e;
 
 	xs.erase(xs.begin() + s, xs.begin() + e);
 	ys.erase(ys.begin() + s, ys.begin() + e);

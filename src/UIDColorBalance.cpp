@@ -64,15 +64,15 @@ void UIDColorBalance::on_resize(int width, int height) {
 
 void UIDColorBalance::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cRed) {
-		red = cRed.get_value();
+		red = (int)cRed.get_value();
 		shouldInvalidate = true;
 	}
 	else if (element == &cGreen) {
-		green = cGreen.get_value();
+		green = (int)cGreen.get_value();
 		shouldInvalidate = true;
 	}
 	else if (element == &cBlue) {
-		blue = cBlue.get_value();
+		blue = (int)cBlue.get_value();
 		shouldInvalidate = true;
 	}
 	else if (element == &chkPreserveLum) {

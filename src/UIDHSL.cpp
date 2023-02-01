@@ -103,15 +103,15 @@ void UIDHSL::process_event(OUI* element, uint32_t message, uint64_t param, bool 
 		bool presetCustomized = true;
 
 		if (element == &cHue) {
-			hsl.hue = cHue.get_value();
+			hsl.hue = (int)cHue.get_value();
 			shouldInvalidate = true;
 		}
 		else if (element == &cSaturation) {
-			hsl.saturation = cSaturation.get_value();
+			hsl.saturation = (int)cSaturation.get_value();
 			shouldInvalidate = true;
 		}
 		else if (element == &cLightness) {
-			hsl.lightness = cLightness.get_value();
+			hsl.lightness = (int)cLightness.get_value();
 			shouldInvalidate = true;
 		}
 		else if (element == &chkColorize) {

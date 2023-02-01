@@ -234,7 +234,7 @@ void UIDChannelMixer::process_event(OUI* element, uint32_t message, uint64_t par
 				chkMono.select(message == Event::Select);
 				isMonochromatic = chkMono.bSelected;
 				shouldInvalidate = isMonochromatic != prevState;
-				if (bInvalidate)
+				if (shouldInvalidate)
 					reset_output_channel_menu();
 				load_preset(7);
 			}

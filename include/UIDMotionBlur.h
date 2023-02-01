@@ -8,7 +8,8 @@ class UIDMotionBlur : public UIDEffect
 	UIComplexS cSize;
 	UIRadialSlide slAngle;
 	UINumber numAngle;
-	double size, angle;
+	double angle;
+	size_t size;
 
 public:
 	void measure_size(int* width, int* height) override;

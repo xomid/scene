@@ -12,7 +12,7 @@ void UISeparator::set_line_colors(Color lineColor, Color shadowColor) {
 void UISeparator::on_update() {
 	UILabel::on_update();
 
-	int y = area.height / 2, l, m, r;
+	int y = area.height / 2, l, r;
 	
 	if (text.length()) {
 		int l = 0;

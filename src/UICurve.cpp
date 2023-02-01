@@ -23,13 +23,13 @@ void LineTo(double* data, int x1, int y1, int x2, int y2, int w, int h)
 
 	for (i = 0; i < d; i += 0.1)
 	{
-		nx = x1 + (i + 0.1) * cos(an) + 0.5;
-		ny = y1 + (i + 0.1) * sin(an) + 0.5;
+		nx = x1 + int(((double)i + 0.1) * cos(an) + 0.5);
+		ny = y1 + int(((double)i + 0.1) * sin(an) + 0.5);
 
 		if (abs(nx - lx) < 2 && abs(ny - ly) < 2) continue;
 
-		lx = ix = x1 + i * cos(an) + 0.5;
-		ly = iy = y1 + i * sin(an) + 0.5;
+		lx = ix = x1 + int((double)i * cos(an) + 0.5);
+		ly = iy = y1 + int((double)i * sin(an) + 0.5);
 
 		if (ix >= 0 && iy >= 0 && ix < w && iy < h)
 		{
@@ -52,13 +52,13 @@ void UICurve::fill_image() {
 	img.clear(0xff, 0xff, 0xff);
 	if (srcImage == NULL || histo == NULL) return;
 
-	int x, y, h1, p, yLevel, invertMin, invertMax, lookupIndex, lookupValue;
+	int x, y, h1, p, yLevel, lookupIndex, lookupValue;
 	int divV = img.h / 4;
 	int divH = img.w / 4;
 	int h = img.h;
 	int w = img.w;
 
-	byte* d, * s, * data, backR, backG, backB, fillR, fillG, fillB;
+	byte* d, * data, backR, backG, backB, fillR, fillG, fillB;
 
 	backR = 0xff;
 	backG = 0xff;
@@ -139,13 +139,13 @@ void UICurve::fill_image() {
 			{
 				curv = cur[q];
 				if (!curv->IsIntact()) continue;
-				minx = curv->xs[0];
-				maxx = curv->xs[curv->nCount - 1];
+				minx = (int)curv->xs[0];
+				maxx = (int)curv->xs[(int)curv->nCount - 1];
 				cr = crs[q];
 
 				can.art.strokeColor.set(cr);
 				lx = 2;
-				ly = curv->ys[0] + 2;
+				ly = (int)curv->ys[0] + 2;
 
 				for (i = minx; i <= maxx; i++)
 				{
@@ -155,7 +155,7 @@ void UICurve::fill_image() {
 					ly = y + 2;
 				}
 
-				can.draw_line(lx, ly, range + 2, curv->ys[curv->nCount - 1] + 2);
+				can.draw_line(lx, ly, range + 2, (int)curv->ys[curv->nCount - 1] + 2);
 			}
 		}
 		else
@@ -170,10 +170,10 @@ void UICurve::fill_image() {
 
 				can.art.strokeColor.set(cr);
 				lx = 2;
-				ly = curv->points_lookup[0] + 2;
+				ly = (int)curv->points_lookup[0] + 2;
 				for (i = 0; i < range; i++)
 				{
-					y = curv->points_lookup[i] + 2.5;
+					y = int(curv->points_lookup[i] + 2.5);
 					can.draw_line(lx, ly, i + 2, y);
 					lx = i + 2;
 					ly = y;
@@ -242,14 +242,12 @@ void UICurve::on_dbl_click(int x, int y, uint32_t flags) {
 
 void UICurve::on_mouse_down(int x, int y, uint32_t flags) {
 	
-
 	iLastSel = -1;
 
 	if (iHover != -2)
 	{
 		if (iHover == -1 && bNew) 
 			process_event(this, Event::Update, 1, true);
-
 
 		set_capture(this);
 		bPressed = true;
@@ -273,32 +271,20 @@ void UICurve::on_mouse_down(int x, int y, uint32_t flags) {
 		{
 			dx = Min(Max(x, 2), ra + 2);
 			dy = Min(Max(y, 0), ra + 2);
-			in = (dx - 2) * 255.0 / ra + 0.5;
-			out = curve->value_lookup[in];
+			in = int(double(dx - 2) * 255.0 / (double)ra + 0.5);
+			out = (int)curve->value_lookup[in];
 		}
 		else
 		{
-			if (iHover < 0 || iHover > curve->nCount)
+			if (iHover < 0 || iHover > (int)curve->nCount)
 				int r = 0;
 
-			dx = curve->xs[iHover];
-			dy = curve->ys[iHover];
-			in = dx * 255.0 / ra + 0.5;
-			out = curve->value_lookup[in];
+			dx = (int)curve->xs[iHover];
+			dy = (int)curve->ys[iHover];
+			in = (int)((double)dx * 255. / (double)ra + 0.5);
+			out = (int)curve->value_lookup[in];
 		}
-
-		/*
-		Rect rc;
-		rc.left += dx + 4;
-		rc.top += dy + 4;
-		rc.width = 100;
-		rc.height = 64;
-
-		wndInfo->SetValues(in, out);
-		wndInfo->ShowWindow(SW_SHOW);
-		wndInfo->MoveWindow(rc);*/
 	}
-
 
 	invalidate();
 }
@@ -324,23 +310,23 @@ void UICurve::on_mouse_move(int x, int y, uint32_t flags) {
 				{
 					if (curve->xs[0] >= curve->xs[1])
 					{
-						dx -= (curve->xs[0] - curve->xs[1]) + 1;
-						curve->xs[0] = curve->xs[1] - 1;
+						dx -= int((curve->xs[0] - curve->xs[1]) + 1);
+						curve->xs[0] = curve->xs[1] - 1.;
 					}
 					else if (curve->xs[0] < 0)
 					{
-						dx -= curve->xs[0];
+						dx -= (int)curve->xs[0];
 						curve->xs[0] = 0;
 					}
 
 					if (curve->ys[0] > range - 1)
 					{
-						dy -= curve->ys[0] - (range - 1);
-						curve->ys[0] = range - 1;
+						dy -= (int)curve->ys[0] - (range - 1);
+						curve->ys[0] = (double)(range - 1);
 					}
 					else if (curve->ys[0] < 0)
 					{
-						dy -= curve->ys[0];
+						dy -= (int)curve->ys[0];
 						curve->ys[0] = 0;
 					}
 				}
@@ -348,51 +334,48 @@ void UICurve::on_mouse_move(int x, int y, uint32_t flags) {
 				{
 					if (curve->xs[iHover] <= curve->xs[iHover - 1])
 					{
-						dx -= curve->xs[iHover] - curve->xs[iHover - 1] - 1;
+						dx -= (int)(curve->xs[iHover] - curve->xs[iHover - 1] - 1);
 						curve->xs[iHover] = curve->xs[iHover - 1] + 1;
 					}
 					else if (curve->xs[iHover] > range - 1)
 					{
-						dx -= curve->xs[iHover] - (range - 1);
-						curve->xs[iHover] = range - 1;
+						dx -= (int)curve->xs[iHover] - (range - 1);
+						curve->xs[iHover] = (double)(range - 1);
 					}
 					if (curve->ys[iHover] > range - 1)
 					{
-						dy -= curve->ys[iHover] - (range - 1);
-						curve->ys[iHover] = range - 1;
+						dy -= (int)curve->ys[iHover] - (range - 1);
+						curve->ys[iHover] = (double)(range - 1);
 					}
 					else if (curve->ys[iHover] < 0)
 					{
-						dy -= curve->ys[iHover];
+						dy -= (int)curve->ys[iHover];
 						curve->ys[iHover] = 0;
 					}
 				}
 				else if (curve->xs[iHover] >= curve->xs[iHover + 1])
 				{
 					bSuspend = 1;
-					lastPressedX = curve->xs[iHover - 1] + 1;
-					lastPressedY = curve->ys[iHover];
+					lastPressedX = (int)curve->xs[iHover - 1] + 1;
+					lastPressedY = (int)curve->ys[iHover];
 					curve->Remove(iHover);
-					//wndInfo->ShowWindow(SW_HIDE);
 				}
 				else if (curve->xs[iHover] <= curve->xs[iHover - 1])
 				{
 					bSuspend = 1;
-					lastPressedX = curve->xs[iHover + 1] - 1;
-					lastPressedY = curve->ys[iHover];
+					lastPressedX = (int)curve->xs[iHover + 1] - 1;
+					lastPressedY = (int)curve->ys[iHover];
 					curve->Remove(iHover);
-					//wndInfo->ShowWindow(SW_HIDE);
 				}
 				lastPressedX += dx;
 				lastPressedY += dy;
 
-				if (iHover && iHover < curve->nCount - 1 && curve->ys[iHover] >(range - 1) || curve->ys[iHover] < 0)
+				if (iHover && iHover < (int)curve->nCount - 1 && (int)curve->ys[iHover] > (range - 1) || (int)curve->ys[iHover] < 0)
 				{
 					bSuspend = 1;
-					lastPressedX = curve->xs[iHover];
-					lastPressedY = curve->ys[iHover];
+					lastPressedX = (int)curve->xs[iHover];
+					lastPressedY = (int)curve->ys[iHover];
 					curve->Remove(iHover);
-					//wndInfo->ShowWindow(SW_HIDE);
 				}
 
 				curve->FillData();
@@ -401,12 +384,11 @@ void UICurve::on_mouse_move(int x, int y, uint32_t flags) {
 			{
 				lastPressedX += dx;
 				lastPressedY += dy;
-				if (lastPressedX > curve->xs[iHover - 1] && lastPressedX < curve->xs[iHover] && lastPressedY >= 0 && lastPressedY < range)
+				if (lastPressedX > (int)curve->xs[iHover - 1] && lastPressedX < (int)curve->xs[iHover] && lastPressedY >= 0 && lastPressedY < range)
 				{
 					curve->Insert(iHover, lastPressedX, lastPressedY);
 					curve->FillData();
 					bSuspend = 0;
-					//wndInfo->ShowWindow(SW_SHOW);
 				}
 			}
 		}
@@ -416,7 +398,8 @@ void UICurve::on_mouse_move(int x, int y, uint32_t flags) {
 			if (bNew)
 				process_event(this, Event::Update, 0, true);
 
-			LineTo(curve->points_lookup, Min(Max(lastPressedX - 2, 0), ra), Min(Max(lastPressedY - 2, 0), ra), Min(Max(x - 2, 0), ra), Min(Max(y - 2, 0), ra), range, range);
+			LineTo(curve->points_lookup, Min(Max(lastPressedX - 2, 0), ra), 
+				Min(Max(lastPressedY - 2, 0), ra), Min(Max(x - 2, 0), ra), Min(Max(y - 2, 0), ra), range, range);
 
 			lastPressedX = x;
 			lastPressedY = y;
@@ -433,24 +416,16 @@ void UICurve::on_mouse_move(int x, int y, uint32_t flags) {
 			{
 				dx = Min(Max(x, 2), ra + 2);
 				dy = Min(Max(y, 0), ra + 2);
-				in = (dx - 2) * 255.0 / ra + 0.5;
-				out = curve->value_lookup[in];
+				in = (int)(double(dx - 2) * 255.0 / (double)ra + 0.5);
+				out = (int)curve->value_lookup[in];
 			}
 			else
 			{
-				dx = curve->xs[iHover];
-				dy = curve->ys[iHover];
-				in = dx * 255.0 / ra + 0.5;
-				out = curve->value_lookup[in];
+				dx = (int)curve->xs[iHover];
+				dy = (int)curve->ys[iHover];
+				in = (int)((double)dx * 255.0 / (double)ra + 0.5);
+				out = (int)curve->value_lookup[in];
 			}
-
-			//Rect rc;
-			//rc.left += dx + 4;
-			//rc.top += dy + 4;
-			//rc.right = rc.left + 100;
-			//rc.bottom = rc.top + 64;
-			//wndInfo->SetValues(in, out);
-			//wndInfo->MoveWindow(rc);
 		}
 
 		process_event(this, Event::Update, 2, true);
@@ -461,17 +436,14 @@ void UICurve::on_mouse_move(int x, int y, uint32_t flags) {
 
 		if (iHover == -1)
 		{
-			//SetCursor(AfxGetApp()->LoadStandardCursor(IDC_CROSS));
 			iCursor = 1;
 		}
 		else if (iHover > -1)
 		{
-			//SetCursor(AfxGetApp()->LoadStandardCursor(IDC_SIZEALL));
 			iCursor = 2;
 		}
 		else if (iHover == -2)
 		{
-			//SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
 			iCursor = 0;
 			bCanChangeCursor = 1;
 		}
@@ -508,9 +480,8 @@ void UICurve::on_update() {
 	OUI::on_update();
 	canvas.bit_blt(img, contentArea.left, contentArea.top, contentArea.width, contentArea.height, 0, 0, true);
 
-	int l, t, n, i, x, y;
+	int l, i, x, y;
 	int cr = 255;
-	unsigned long* histo;
 
 	Border boxBorder;
 	boxBorder.set(1, Colors::purple);
@@ -539,8 +510,8 @@ void UICurve::on_update() {
 	{
 		if (bMoving && !bSuspend)
 		{
-			x = curve->xs[iLastSel] + 2;
-			y = curve->ys[iLastSel] + 2;
+			x = (int)curve->xs[iLastSel] + 2;
+			y = (int)curve->ys[iLastSel] + 2;
 
 			path.remove_all();
 			canvas.reset();
@@ -554,37 +525,37 @@ void UICurve::on_update() {
 			canvas.render(Color(220, 220, 220));
 		}
 
-		x = curve->xs[iLastSel], y = curve->ys[iLastSel];
+		x = (int)curve->xs[iLastSel], y = (int)curve->ys[iLastSel];
 		rcBox.set(x, y, 5, 5);
 		canvas.draw_box(rcBox, boxBorder, 0xff);
 	}
 
 	int maxx, minx, ra = range - 1;
 	curve->nCount = curve->xs.size();
-	minx = curve->xs[0];
-	maxx = curve->xs[curve->nCount - 1];
+	minx = (int)curve->xs[0];
+	maxx = (int)curve->xs[(int)curve->nCount - 1];
 
 	if (bSmooth)
 	{
 		path.remove_all();
 		canvas.reset();
 
-		path.move_to(2, curve->ys[0] + 2);
+		path.move_to(2., curve->ys[0] + 2.);
 		for (i = minx; i <= maxx; i++) {
 			y = Min(Max(curve->evalSpline(i), 0), ra);
-			path.line_to(i + 2, y + 2);
+			path.line_to((double)(i + 2), double(y + 2));
 		}
-		path.line_to(range + 2, curve->ys[curve->nCount - 1] + 2);
+		path.line_to((double)(range + 2), curve->ys[(int)curve->nCount - 1] + 2.);
 
 		canvas.add_path<agg::conv_stroke<agg::path_storage>>(stroke);
 		canvas.render(crLine);
 
-		l = curve->nCount;
+		l = (int)curve->nCount;
 
 		for (i = 0; i < l; i++)
 		{
 			if (i == iLastSel) continue;
-			x = curve->xs[i], y = curve->ys[i];
+			x = (int)curve->xs[i], y = (int)curve->ys[i];
 			rcBox.set(x, y, 5, 5);
 			canvas.draw_box(rcBox, boxBorder, 0xff);
 		}
@@ -596,8 +567,8 @@ void UICurve::on_update() {
 
 		for (i = 0; i < range; i++)
 		{
-			y = curve->points_lookup[i] + 2.5;
-			path.line_to(i + 2, y);
+			y = (int)(curve->points_lookup[i] + 2.5);
+			path.line_to((double)(i + 2), (double)y);
 		}
 
 		canvas.add_path<agg::conv_stroke<agg::path_storage>>(stroke);
@@ -662,23 +633,18 @@ int UICurve::DotsHover(int x, int y)
 
 	for (i = 0; i < curve->nCount; i++)
 	{
-		d = hypot(x - curve->xs[i], y - curve->ys[i]);
+		d = (int)hypot(x - (int)curve->xs[i], y - (int)curve->ys[i]);
 		if (d < DOT_RADIUS)
-		{
 			return i;
-		}
 	}
 
 	if (x - 1 > curve->xs[curve->nCount - 1])
-		return curve->nCount - 1;
+		return (int)curve->nCount - 1;
 	if (x - 3 < curve->xs[0])
 		return 0;
 
-	int r;
-
 	x = Min(Max(x - 2, 0), range - 1);
 	y = Min(Max(y - 2, 0), range - 1);
-
 	y = Min(Max(curve->evalSpline(x - 2), 0), range - 1);
 
 	if (y > y - DOT_RADIUS && y < y + DOT_RADIUS)

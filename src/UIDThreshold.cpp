@@ -50,7 +50,7 @@ void UIDThreshold::on_resize(int width, int height) {
 
 void UIDThreshold::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cLevels) {
-		threshold = cLevels.get_value();
+		threshold = CLAMP255(cLevels.get_value());
 		shouldInvalidate = true;
 	}
 	else if (element == &chkMono) {

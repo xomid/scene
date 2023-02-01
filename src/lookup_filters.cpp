@@ -26,30 +26,30 @@ blockBottom = CLAMP3(0, blockBottom, h);
 
 
 
-static float biasf(float a, float b)
+static double biasf(double a, double b)
 {
-	//		return (float)Math.pow(a, Math.log(b) / Math.log(0.5));
-	return a / ((1.0f / b - 2) * (1.0f - a) + 1);
+	//		return (double)Math.pow(a, Math.log(b) / Math.log(0.5));
+	return a / ((1. / b - 2.) * (1. - a) + 1.);
 }
 
-static float gainf(float a, float b) {
+static double gainf(double a, double b) {
 	/*
-	float p = (float)Math.log(1.0 - b) / (float)Math.log(0.5);
+	double p = (double)Math.log(1.0 - b) / (double)Math.log(0.5);
 
 	if (a < .001)
 	return 0.0f;
 	else if (a > .999)
 	return 1.0f;
 	if (a < 0.5)
-	return (float)Math.pow(2 * a, p) / 2;
+	return (double)Math.pow(2 * a, p) / 2;
 	else
-	return 1.0f - (float)Math.pow(2 * (1. - a), p) / 2;
+	return 1.0f - (double)Math.pow(2 * (1. - a), p) / 2;
 	*/
-	float c = (1.0f / b - 2.0f) * (1.0f - 2.0f * a);
+	double c = (1.0 / b - 2.0) * (1.0 - 2.0 * a);
 	if (a < 0.5)
-		return a / (c + 1.0f);
+		return a / (c + 1.0);
 	else
-		return (c - a) / (c - 1.0f);
+		return (c - a) / (c - 1.0);
 }
 
 
@@ -166,13 +166,13 @@ int GainBlob::init(double gain, double bias) {
 	bias = CLAMP3F(0., bias, 1.);
 
 	if (!isSet || are_not_equal(this->gain, gain) || are_not_equal(this->bias, bias)) {
-		float f;
+		double f;
 		for (int i = 0; i < 256; i++)
 		{
-			f = i / 255.0;
+			f = i / 255.;
 			f = gainf(f, gain);
 			f = biasf(f, bias);
-			gray[i] = f * 255.0;
+			gray[i] = CLAMP255(int(f * 255.));
 		}
 		isSet = true;
 		this->gain = gain;

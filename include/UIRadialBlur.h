@@ -15,7 +15,7 @@ class UIRadialBlur : public UIButton
 public:
 	
 	void get_pivot_point(double& cx, double& cy);
-	void set_amount(int amout); //[1-100]
+	void set_amount(double amout); //[1-100]
 	void set_blur_mode(RadialBlurMode blurMode);
 	virtual void fill_image();
 	void on_init() override;

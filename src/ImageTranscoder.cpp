@@ -157,7 +157,7 @@ FILE* get_file(std::wstring& filePath, const wchar* mode) {
 	FILE* file;
 	_wfopen_s(&file, filePath.c_str(), mode);
 	if (file == NULL) {
-		fprintf(stderr, "ImageTranscoder: can't open \"%s\"\n", filePath.c_str());
+		fwprintf(stderr, L"ImageTranscoder: can't open \"%s\"\n", filePath.c_str());
 		return 0;
 	}
 	return file;

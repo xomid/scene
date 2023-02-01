@@ -178,16 +178,16 @@ void UIMainView::on_key_down(uint32_t key, uint32_t nrep, uint32_t flags) {
 		case 189: case 109: zoom(-1); break;
 		case 48: case 96:
 			imgProps.scale = 1.0;
-			int iw = imgProps.scale * image->w - imgProps.width, ih = imgProps.scale * image->h - imgProps.height;
+			int iw = int(imgProps.scale * image->w) - imgProps.width, ih = int(imgProps.scale * image->h) - imgProps.height;
 
-			int x = ((clientWidth - 10) / 2.0) - imgProps.left;
-			int y = ((clientHeight - 10) / 2.0) - imgProps.top;
+			int x = ((clientWidth - 10) / 2) - imgProps.left;
+			int y = ((clientHeight - 10) / 2) - imgProps.top;
 
-			double dx = x / (double)imgProps.width;
-			double dy = y / (double)imgProps.height;
+			double dx = (double)x / (double)imgProps.width;
+			double dy = (double)y / (double)imgProps.height;
 
-			imgProps.left -= iw * dx;
-			imgProps.top -= ih * dy;
+			imgProps.left -= int(iw * dx);
+			imgProps.top -= int(ih * dy);
 
 			zoom(imgProps.scale);
 			break;
@@ -207,8 +207,8 @@ void UIMainView::zoom(double newScale)
 
 	OUI::get_content_area(unmodifiedContentArea);
 	imgProps.scale = fmax(fmin(newScale, MAX_SCALE), imgProps.minScale);
-	imgProps.width = imgProps.scale * image->w;
-	imgProps.height = imgProps.scale * image->h;
+	imgProps.width = int(imgProps.scale * image->w);
+	imgProps.height = int(imgProps.scale * image->h);
 
 	clientWidth = unmodifiedContentArea.width;
 	clientHeight = unmodifiedContentArea.height;
@@ -260,16 +260,16 @@ void UIMainView::zoom_dir(bool Up) // -1 down, 0 set, 1 up
 
 	}
 
-	int iw = ds * image->w - imgProps.width, ih = ds * image->h - imgProps.height;
+	int iw = int(ds * image->w - imgProps.width), ih = int(ds * image->h) - imgProps.height;
 
-	int x = ((clientWidth - 10) / 2.0) - imgProps.left;
-	int y = ((clientHeight - 10) / 2.0) - imgProps.top;
+	int x = (clientWidth - 10) / 2 - imgProps.left;
+	int y = (clientHeight - 10) / 2 - imgProps.top;
 
-	double dx = x / (double)imgProps.width;
-	double dy = y / (double)imgProps.height;
+	double dx = (double)x / (double)imgProps.width;
+	double dy = (double)y / (double)imgProps.height;
 
-	imgProps.left -= iw * dx;
-	imgProps.top -= ih * dy;
+	imgProps.left -= int(iw * dx);
+	imgProps.top -= int(ih * dy);
 
 
 	zoom(ds);
@@ -280,16 +280,16 @@ void UIMainView::zoom_rel(double ds) // -1 down, 0 set, 1 up
 	if (!image) return;
 
 	imgProps.scale = ds;
-	int iw = ds * image->w - imgProps.width, ih = ds * image->h - imgProps.height;
+	int iw = int(ds * image->w) - imgProps.width, ih = int(ds * image->h) - imgProps.height;
 
-	int x = ((clientWidth - 10) / 2.0) - imgProps.left;
-	int y = ((clientHeight - 10) / 2.0) - imgProps.top;
+	int x = (clientWidth - 10) / 2 - imgProps.left;
+	int y = (clientHeight - 10) / 2 - imgProps.top;
 
-	double dx = x / (double)imgProps.width;
-	double dy = y / (double)imgProps.height;
+	double dx = (double)x / (double)imgProps.width;
+	double dy = (double)y / (double)imgProps.height;
 
-	imgProps.left -= iw * dx;
-	imgProps.top -= ih * dy;
+	imgProps.left -= int(iw * dx);
+	imgProps.top -= int(ih * dy);
 
 	zoom(imgProps.scale);
 }
@@ -304,16 +304,16 @@ void UIMainView::zoom(int dir, int lx, int ly)
 
 	if (ds < 1.1 && ds > 0.9) imgProps.scale = ds = 1.0;
 
-	int iw = ds * image->w - imgProps.width, ih = ds * image->h - imgProps.height;
+	int iw = int(ds * image->w) - imgProps.width, ih = int(ds * image->h) - imgProps.height;
 
 	int x = lx - imgProps.left;
 	int y = ly - imgProps.top;
 
-	double dx = x / (double)imgProps.width;
-	double dy = y / (double)imgProps.height;
+	double dx = (double)x / (double)imgProps.width;
+	double dy = (double)y / (double)imgProps.height;
 
-	imgProps.left -= iw * dx;
-	imgProps.top -= ih * dy;
+	imgProps.left -= int(iw * dx);
+	imgProps.top -= int(ih * dy);
 
 	zoom(imgProps.scale);
 }
@@ -333,8 +333,8 @@ void UIMainView::zoom_fit() {
 			(double)(unmodifiedContentArea.height - padding.top - padding.bottom) / (double)image->h
 		);
 
-		imgProps.left = round(((double)unmodifiedContentArea.width - (double)image->w * ds) / 2.0);
-		imgProps.top = round(((double)unmodifiedContentArea.height - (double)image->h * ds) / 2.0);
+		imgProps.left = (int)round(((double)unmodifiedContentArea.width - (double)image->w * ds) / 2.0);
+		imgProps.top = (int)round(((double)unmodifiedContentArea.height - (double)image->h * ds) / 2.0);
 
 		zoom(ds);
 	}
@@ -364,10 +364,10 @@ void UIMainView::alert_parent(uint32_t message) {
 
 void UIMainView::set_zoom_info(ZoomInfo zInfo) {
 	if (!image) return;
-	imgProps.width = zInfo.scale * image->w;
-	imgProps.height = zInfo.scale * image->h;
-	imgProps.left = -zInfo.l * imgProps.width;
-	imgProps.top = -zInfo.t * imgProps.height;
+	imgProps.width = int(zInfo.scale * image->w);
+	imgProps.height = int(zInfo.scale * image->h);
+	imgProps.left = int(-zInfo.l * imgProps.width);
+	imgProps.top = int(-zInfo.t * imgProps.height);
 	clamp_image_position();
 	zoom(zInfo.scale);
 }

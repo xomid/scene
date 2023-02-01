@@ -215,7 +215,7 @@ void UISideView::process_event(OUI* element, uint32_t message, uint64_t param, b
 }
 
 void UISideView::on_resize(int width, int height) {
-	int l, t, w, h, bh, lh, lrMargin;
+	int l, t, w, bh, lh, lrMargin;
 	l = 0;
 	t = 7;
 	bh = 30;

@@ -45,8 +45,8 @@ void UIDBulge::process_event(OUI* element, uint32_t message, uint64_t param, boo
 	}
 }
 
-void UIDBulge::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDBulge::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	ImageEffect::bulge(srcImage, dstImage, amount, shouldStretch, .5, .5,
+	return ImageEffect::bulge(srcImage, dstImage, amount, shouldStretch, .5, .5,
 		blockLeft, blockTop, blockRight, blockBottom);
 }

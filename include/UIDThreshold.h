@@ -9,7 +9,7 @@ class UIDThreshold : public UIDEffect
 	UIComplexS cLevels;
 	UICheck chkMono;
 	bool bMono;
-	int threshold;
+	byte threshold;
 	ThresholdBlob* blob;
 
 public:

@@ -17,7 +17,8 @@ public:
 	std::vector<double> ks;
 	byte* value_lookup;
 	double* points_lookup;
-	int range, nCount;
+	int range;
+	size_t nCount;
 	bool bSmooth, bIntact;
 	double** AA;
 

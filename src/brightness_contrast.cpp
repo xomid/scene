@@ -47,9 +47,9 @@ int BrightnessContrastBlob::init(int brightness, int contrast, bool bLegacy) {
 				if (contrast >= 0) {
 					b = CLAMP255(i + brightness);
 
-					x = (abs(contrast) / 100.0) * 127.5;
-					n = (2 * (127.5 - x));
-					slope = 255.0 / n;
+					x = int((abs(contrast) / 100.0) * 127.5);
+					n = int(2. * (127.5 - (double)x));
+					slope = int(255.0 / double(n));
 					n = x + n;
 
 					c = 0;
@@ -57,13 +57,13 @@ int BrightnessContrastBlob::init(int brightness, int contrast, bool bLegacy) {
 					else if (b > n) c = 255;
 				}
 				else {
-					y = (abs(contrast) / 100.0) * 127.5;
-					slope = (2.0 * (127 - y)) / 255.0;
-					b = y + (i * slope + 0.5);
+					y = int((fabs((double)contrast) / 100.0) * 127.5);
+					slope = int(2.0 * double(127 - y) / 255.0);
+					b = y + int((double)i * slope + 0.5);
 					c = CLAMP255(b + brightness);
 				}
 
-				gray[i] = c;
+				gray[i] = CLAMP255(c);
 			}
 		}
 		else

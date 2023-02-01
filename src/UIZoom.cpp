@@ -27,19 +27,19 @@ void UIZoom::set_zoom_info(ZoomInfo zInfo) {
 		int l, t, w, h;
 		double rat = srcImage->w / double(srcImage->h);
 		w = contentArea.width;
-		h = w / rat;
+		h = int(double(w) / rat);
 		l = 0;
 		t = (contentArea.height - h) / 2;
 		if (h > contentArea.height)
 		{
 			t = 0;
 			h = contentArea.height;
-			w = h * rat;
+			w = int(double(h) * rat);
 			l = (contentArea.width - w) / 2;
 		}
 
 		rcImage.set(l, t, w, h);
-		rcZoom.set(zInfo.l * w + l, zInfo.t * h + t, w * zInfo.w, h * zInfo.h);
+		rcZoom.set(int(zInfo.l * double(w)) + l, int(zInfo.t * h) + t, int(w * zInfo.w), int(h * zInfo.h));
 
 		int r = CLAMP3(rcImage.left, rcZoom.right(), rcImage.right());
 		rcZoomClipped.left = CLAMP3(rcImage.left, rcZoom.left, rcImage.right());

@@ -72,8 +72,8 @@ void UIDAddNoise::process_event(OUI* element, uint32_t message, uint64_t param, 
 	}
 }
 
-void UIDAddNoise::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
+int UIDAddNoise::render(Sheet* srcImage, Sheet* dstImage, int blockLeft, int blockTop, int blockRight, int blockBottom)
 {
-	ImageEffect::add_noise(srcImage, dstImage, noiseType, amount, bMono,
+	return ImageEffect::add_noise(srcImage, dstImage, noiseType, amount, bMono,
 		blockLeft, blockTop, blockRight, blockBottom);
 }

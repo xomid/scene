@@ -7,7 +7,7 @@ void UIRadialBlur::get_pivot_point(double& cx, double& cy) {
 	cy = this->cy;
 }
 
-void UIRadialBlur::set_amount(int amount) {
+void UIRadialBlur::set_amount(double amount) {
 	this->amount = amount;
 	fill_image();
 }
@@ -36,16 +36,15 @@ void UIRadialBlur::on_update() {
 void UIRadialBlur::calc_offset() {
 	cx = fmin(fmax(cx, .0), 1.);
 	cy = fmin(fmax(cy, .0), 1.);
-	offsetX = (1. - cx) * img.w / 2;
-	offsetY = (1. - cy) * img.h / 2;
+	offsetX = int((1. - cx) * (double)img.w / 2.);
+	offsetY = int((1. - cy) * (double)img.h / 2.);
 }
 
 void UIRadialBlur::fill_image() {
 
 	constexpr int RADIUS_LENGTH = 64;
-	double sc;
-	int fcx, fcy, fr, sb, sg, sr, u, v, fx, fy, i, fsr, ox1, ox2, oy1, oy2, x, y, w, h, p, sp, fcxx, fcyy, ffsr, right, bottom;
-	pyte srcData, disData, d, s;
+	int fcx, fcy, fr, sb, sg, sr, sc, u, v, fx, fy, i, fsr, ox1, ox2, oy1, oy2, x, y, w, h, p, sp, fcxx, fcyy, ffsr, right, bottom;
+	pyte srcData, disData, d;
 
 	sb = 0;
 	sg = 0;
@@ -54,7 +53,7 @@ void UIRadialBlur::fill_image() {
 	disData = img.data;
 	p = img.pitch;
 
-	int length = amount;
+	int length = (int)amount;
 	fr = (int)(amount * PI * 65536.0 / 181.0);
 	fcx = (int)(img.w * 32768);
 	fcy = (int)(img.h * 32768);

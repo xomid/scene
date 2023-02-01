@@ -13,7 +13,8 @@ int main() {
 			if (wnd) wnd->bDrawBoxModel = true;
 		}
 	}*/
-
+	//auto wnd = wmg.get(0);
+	//if (wnd) wnd->show_box_model();
 	return wmg.run();
 }
 

@@ -48,11 +48,11 @@ void UIDContBright::on_resize(int width, int height) {
 
 void UIDContBright::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &scBright) {
-		brightness = scBright.get_value();
+		brightness = (int)scBright.get_value();
 		shouldInvalidate = true;
 	}
 	else if (element == &scContst) {
-		contrast = scContst.get_value();
+		contrast = (int)scContst.get_value();
 		shouldInvalidate = true;
 	}
 	else if (element == &chkLegacy) {

@@ -25,8 +25,8 @@ void UIDRadialBlur::on_init() {
 	amount = 1;
 	cx = .5;
 	cy = .5;
-	cAmount.config((double)amount, 1., 1., 100., 80);
-	cBlur.set_amount(amount);
+	cAmount.config(amount, 1., 1., 100., 80);
+	cBlur.set_amount((int)amount);
 	cBlur.set_blur_mode(RadialBlurMode::Spin);
 	rdSpin.select(true);
 }

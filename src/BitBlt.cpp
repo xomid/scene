@@ -12,7 +12,7 @@ void bit_blt_fill_rest(Rect* area, Sheet* dstSheet, int dstLeft, int dstTop, int
 	dstTop += area->top;
 
 	int dx, dy, dsx, dsy, dex, dey, dp, dw, dr, db, dh, drw, drh, drex, drey, drsx, drsy,
-		sx, sy, ssx, ssy, sex, sey, sp, sw, sr, sb, sh, sxu, sxrem;
+		sy, ssx, ssy, sex, sey, sp, sw, sr, sb, sh;
 	int trim_dsx, trim_dsy, trim_dex, trim_dey, sr_exclude, sb_exclude;
 	pyte dst, src, d, s, srow, drow;
 	byte sred, sgrn, sblu;
@@ -64,7 +64,7 @@ void bit_blt_fill_rest(Rect* area, Sheet* dstSheet, int dstLeft, int dstTop, int
 
 	_mx = trim_dsx * sw - dsx * sw + ssx * dw;
 	my = trim_dsy * sh - dsy * sh + ssy * dh;
-	pyte d_end, d_start;
+	pyte d_end;
 	int len1, len2, len3;
 	len1 = (trim_dsx - drsx) * 3;
 	len2 = (drex - trim_dex) * 3;
@@ -165,8 +165,8 @@ void bit_blt(Rect* area, Sheet* dstSheet, int dstLeft, int dstTop, int dstWidth,
 		return;
 
 	int dx, dy, count;
-	byte cla, clp, a, p, * d, * s;
-	byte* __restrict src, * __restrict dst;
+	byte cla, clp, * d, * s;
+	byte* __restrict dst;
 
 	int
 		dlenx = dstSheet->nbpp * (ex - sx),

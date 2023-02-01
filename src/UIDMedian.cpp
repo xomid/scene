@@ -19,8 +19,8 @@ void UIDMedian::on_init() {
 	cPercentile.set_text(L"Percentile");
 	radius = 0;
 	percentile = 0;
-	cRadius.config(radius, 1., 1, 200., 60);
-	cPercentile.config(percentile, 1., 0, 100., 60);
+	cRadius.config((double)radius, 1., 1, 200., 60);
+	cPercentile.config((double)percentile, 1., 0, 100., 60);
 
 	blob = new MedianBlob();
 }

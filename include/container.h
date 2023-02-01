@@ -53,7 +53,6 @@ class UIContainer : public OUI
 	UIDialog dlgCloseWithoutSave;
 	UIDProgress dlgProgress;
 
-	/*
 	UIDAddNoise dlgAddNoise;
 	UIDBulge dlgBulge;
 	UIDCrystalize dlgCrystalize;
@@ -80,7 +79,6 @@ class UIContainer : public OUI
 	UIDTileGlass dlgTileGlass;
 	UIDWater dlgWater;
 	UIDWave dlgWave;
-	
 	UIDContBright dlgContBright;
 	UIDChannelMixer dlgChannelMixer;
 	UIDColorBalance dlgColorBalance;
@@ -88,7 +86,7 @@ class UIContainer : public OUI
 	UIDHSL dlgHSL;
 	UIDLevels dlgLevels;
 	UIDPosterize dlgPosterize;
-	UIDThreshold dlgThreshold;*/
+	UIDThreshold dlgThreshold;
 
 	UIDEffect* currEffectDlg;
 	std::vector<FileDialogFileType> fileTypes;

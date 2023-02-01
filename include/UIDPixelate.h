@@ -5,7 +5,7 @@
 class UIDPixelate : public UIDEffect
 {
 	UIComplexS cCellSize;
-	int cellSize;
+	size_t cellSize;
 
 public:
 	void measure_size(int* width, int* height) override;

@@ -36,8 +36,7 @@ void UIButtonWithThumbnail::transform(bool big) {
 		canvas.art.alignX = Align::CENTER;
 		canvas.art.alignY = Align::BOTTOM;
 
-		int m = 10;
-		int textH = canvas.get_box16((wchar_t*)text.c_str(), text.length())->get_height();
+		int m = 10, textH = canvas.get_box16((wchar_t*)text.c_str(), text.length())->get_height();
 
 		padding.set(m);
 
@@ -46,8 +45,8 @@ void UIButtonWithThumbnail::transform(bool big) {
 			(double)(boxModel.height - thumbPadding.top - thumbPadding.bottom - textH) / (double)thumb.h
 		);
 
-		rcThumb.set( (boxModel.width - thumb.w * ds) / 2, padding.top,
-			ds * (double)thumb.w, ds * (double)thumb.h);
+		rcThumb.set((boxModel.width - (int)(thumb.w * ds)) / 2, padding.top,
+			int(ds * (double)thumb.w), int(ds * (double)thumb.h));
 	}
 	else {
 		canvas.art.alignX = Align::LEFT;
@@ -58,8 +57,8 @@ void UIButtonWithThumbnail::transform(bool big) {
 			(double)(boxModel.height - thumbPadding.top - thumbPadding.bottom) / (double)thumb.h
 		);
 
-		rcThumb.set(thumbPadding.left, (boxModel.height - thumb.h * ds) / 2,
-			ds * (double)thumb.w, ds * (double)thumb.h);
+		rcThumb.set(thumbPadding.left, (boxModel.height - (int)(thumb.h * ds)) / 2,
+			int(ds * (double)thumb.w), int(ds * (double)thumb.h));
 
 		padding.set(0, 0, 0, rcThumb.width + thumbPadding.left + thumbPadding.right);
 	}

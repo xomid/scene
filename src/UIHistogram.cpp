@@ -15,7 +15,7 @@ void UIHistogram::fill_image() {
 	if (srcImage == NULL) return;
 
 	int x, y, w, h, h1, p, yLevel, invertMin, invertMax, lookupIndex, lookupValue;
-	byte *d, *s, *data, backR, backG, backB, fillR, fillG, fillB;
+	byte *d, *data, backR, backG, backB, fillR, fillG, fillB;
 
 	data = img.data;
 	w = img.w;

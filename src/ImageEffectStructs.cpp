@@ -32,22 +32,18 @@ int LevelsBlob::init(ChannelLevelInfo& rgbInfo, ChannelLevelInfo& redInfo, Chann
 		this->rgbInfo != rgbInfo || this->redInfo != redInfo ||
 		this->greenInfo != greenInfo || this->blueInfo != blueInfo)
 	{
-		int i, n, val;
-		int rlin, glin, blin, vlin;
-		double rse, gse, bse, vse;
+		int i, rlin, glin, blin, vlin, e;
+		double rse, gse, bse, vse, range;
 
 		vlin = rgbInfo.outputMin;
 		rlin = redInfo.outputMin;
 		glin = greenInfo.outputMin;
 		blin = blueInfo.outputMin;
 
-		vse = (rgbInfo.outputMax - vlin) / 255.0;
-		rse = (redInfo.outputMax - rlin) / 255.0;
-		gse = (greenInfo.outputMax - glin) / 255.0;
-		bse = (blueInfo.outputMax - blin) / 255.0;
-
-		int e, k;
-		double range;
+		vse = double((int)rgbInfo.outputMax - vlin) / 255.0;
+		rse = double((int)redInfo.outputMax - rlin) / 255.0;
+		gse = double((int)greenInfo.outputMax - glin) / 255.0;
+		bse = double((int)blueInfo.outputMax - blin) / 255.0;
 
 		e = rgbInfo.maxRange + 1;
 		range = rgbInfo.maxRange - rgbInfo.minRange;
@@ -59,14 +55,14 @@ int LevelsBlob::init(ChannelLevelInfo& rgbInfo, ChannelLevelInfo& redInfo, Chann
 			vlookup[i] = 255;
 
 		for (i = rgbInfo.minRange; i < e; i++)
-			vlookup[i] = 255 * ((i - rgbInfo.minRange) / range);
+			vlookup[i] = CLAMP255(255. * (double(i - (int)rgbInfo.minRange) / range));
 
 		for (i = 0; i < 256; i++)
 		{
-			vslookup[i] = CLAMP255(i * vse + vlin);
-			bslookup[i] = CLAMP255(i * bse + blin);
-			gslookup[i] = CLAMP255(i * gse + glin);
-			rslookup[i] = CLAMP255(i * rse + rlin);
+			vslookup[i] = CLAMP255(int(i * vse) + vlin);
+			bslookup[i] = CLAMP255(int(i * bse) + blin);
+			gslookup[i] = CLAMP255(int(i * gse) + glin);
+			rslookup[i] = CLAMP255(int(i * rse) + rlin);
 		}
 
 		redInfo.fill_lookup(&rgbInfo);
@@ -111,7 +107,7 @@ int PosterizeBlob::init(byte threshold) {
 		for (int i = 0; i < 256; i++)
 			gray[i] = 255 * (threshold * i / 256) / (threshold - 1);
 		isSet = true;
-		this->threshold == threshold;
+		this->threshold = threshold;
 	}
 
 	return IMAGE_EFFECT_RESULT_OK;
@@ -122,33 +118,34 @@ int SmartBlurBlob::init(size_t& radius, size_t& threshold) {
 	threshold = CLAMP3(0, threshold, 255);
 
 	if (!isSet || this->radius != radius || this->threshold != threshold) {
-		int i, index, ra, row, rows, sigma, sigma22, sigmaPi2, sqrtSigmaPi2, radius2;
+		int i, index, ra, row, rows, radius2, iradius;
+		float sigma, sigmaPi2, sigma22, sqrtSigmaPi2;
 
+		iradius = (int)radius;
 		index = 0;
-		ra = (int)ceil(radius);
+		ra = iradius;
 		rows = ra * 2 + 1;
-		sigma = radius / 3.;
-		sigma22 = 2 * sigma * sigma;
-		sigmaPi2 = 2 * PI * sigma;
+		sigma = (float)iradius / 3.f;
+		sigma22 = 2.f * sigma * sigma;
+		sigmaPi2 = 2.f * (float)PI * sigma;
 		sqrtSigmaPi2 = (float)sqrt(sigmaPi2);
-		radius2 = radius * radius;
+		radius2 = iradius * iradius;
 		float total = 0;
 
 		for (row = -ra; row <= ra; row++)
 		{
 			int d = row * row;
 			if (d > radius2) kernel[index] = 0;
-			else kernel[index] = (float)exp(-(d) / sigma22) / sqrtSigmaPi2;
-			total += kernel[index];
-			index++;
+			else kernel[index] = exp(-float(d) / sigma22) / sqrtSigmaPi2;
+			total += kernel[index++];
 		}
 
 		for (i = 0; i < rows; i++)
 			kernel[i] /= total;
 
 		isSet = true;
-		this->radius == radius;
-		this->threshold == threshold;
+		this->radius = radius;
+		this->threshold = threshold;
 	}
 
 	return IMAGE_EFFECT_RESULT_OK;
@@ -159,8 +156,7 @@ int StampBlob::init(size_t& radius, double& threshold) {
 	threshold = CLAMP3F(0., threshold, 100.);
 
 	if (!isSet || this->radius != radius || are_not_equal(this->threshold, threshold)) {
-		int r = radius;
-		int i, size = 1 + (r * 2);
+		int r = (int)radius, i, size = 1 + (r * 2);
 
 		for (i = 0; i <= r; ++i) {
 			weights[i] = 16 * (i + 1);
@@ -168,22 +164,22 @@ int StampBlob::init(size_t& radius, double& threshold) {
 		}
 
 		isSet = true;
-		this->radius == radius;
-		this->threshold == threshold;
+		this->radius = radius;
+		this->threshold = threshold;
 	}
 
 	return IMAGE_EFFECT_RESULT_OK;
 }
 
 int SoftPortraitBlob::init(size_t& softness, size_t& warmness, int& brightness) {
-	softness = CLAMP3F(0., softness, 10.);
-	warmness = CLAMP3F(0., warmness, 40.);
-	brightness = CLAMP3F(-100., brightness, 100.);
+	softness = CLAMP3(0, softness, 10);
+	warmness = CLAMP3(0, warmness, 40);
+	brightness = CLAMP3(-100, brightness, 100);
 
 	if (!isSet || this->softness != softness || this->warmness != warmness || this->brightness != brightness) {
 		int i, r, size;
 
-		r = softness;
+		r = (int)softness;
 		size = 1 + (r * 2);
 
 		for (i = 0; i <= r; ++i)
@@ -196,9 +192,9 @@ int SoftPortraitBlob::init(size_t& softness, size_t& warmness, int& brightness) 
 			gray[i] = CLAMP255(i + brightness);
 
 		isSet = true;
-		this->softness == softness;
-		this->warmness == warmness;
-		this->brightness == brightness;
+		this->softness = softness;
+		this->warmness = warmness;
+		this->brightness = brightness;
 	}
 
 	return IMAGE_EFFECT_RESULT_OK;
@@ -227,9 +223,9 @@ int GlowBlob::init(int& softness, int& brightness, int& contrast) {
 			gray[i] = CLAMP255((i - 128) * D + (brightness + 128) + 0.5);
 
 		isSet = true;
-		this->softness == softness;
-		this->brightness == brightness;
-		this->contrast == contrast;
+		this->softness = softness;
+		this->brightness = brightness;
+		this->contrast = contrast;
 	}
 
 	return IMAGE_EFFECT_RESULT_OK;
@@ -251,7 +247,7 @@ int MedianBlob::init(size_t& radius, size_t& intensity) {
 					leadingEdgeX[v] = u;
 
 		isSet = true;
-		this->radius == radius;
+		this->radius = radius;
 	}
 
 	return IMAGE_EFFECT_RESULT_OK;
@@ -500,12 +496,12 @@ int MarbleBlob::init(double& telorance, double& scale) {
 
 	if (!isSet || are_not_equal(this->telorance, telorance) || are_not_equal(this->scale, scale)) {
 		int i, j, k;
-		float* vv, turbulence, angle;
-		turbulence = telorance / 100.0;
+		double angle;
+		float* vv, turbulence, s;
+		turbulence = (float)telorance / 100.f;
 
 		for (i = 0; i < 256; i++)
 		{
-			double s;
 			pp[i] = i;
 			g1[i] = (float)(((rand() % 0x7fffffff) % 512) - 256) / 256;
 			for (j = 0; j < 2; j++)
@@ -545,7 +541,7 @@ int MarbleBlob::init(double& telorance, double& scale) {
 
 		for (i = 0; i < 256; i++)
 		{
-			angle = PI * i / 256.0 * turbulence;
+			angle = (double)PI * (double)i / 256.f * turbulence;
 			sinTable[i] = (float)(-scale * sin(angle));
 			cosTable[i] = (float)(scale * cos(angle));
 		}
@@ -564,7 +560,7 @@ int PencilSketchBlob::init(size_t& brushSize, int& range) {
 	if (!isSet || this->brushSize != brushSize || this->range != range) {
 
 		int i, r, size;
-		r = brushSize;
+		r = (int)brushSize;
 		size = 1 + (r * 2);
 
 		for (i = 0; i <= r; ++i)

@@ -7,91 +7,35 @@
 UIDEffect* dlgEffect;
 
 void UIContainer::create_effect_windows() {
-	/*
-	dlgContBright.config(3, 3);
-
-	dlgContBright.create(this);
-	dlgChannelMixer.create(this);
-	dlgColorBalance.create(this);
-	dlgCurves.create(this);
-	dlgHSL.create(this);
-	dlgLevels.create(this);
-	dlgPosterize.create(this);
-	dlgThreshold.create(this);*/
-
-	/*dlgContBright.set_document(&document);
-	dlgChannelMixer.set_document(&document);
-	dlgColorBalance.set_document(&document);
-	dlgCurves.set_document(&document);
-	dlgHSL.set_document(&document);
-	dlgLevels.set_document(&document);
-	dlgPosterize.set_document(&document);
-	dlgThreshold.set_document(&document);
-
-	dlgAddNoise.create(this);
-	dlgBulge.create(this);
-	dlgCrystalize.create(this);
-	dlgDespeckle.create(this);
-	dlgGain.create(this);
-	dlgGlow.create(this);
-	dlgGaussianBlur.create(this);
-	dlgMarble.create(this);
-	dlgMedian.create(this);
-	dlgMotionBlur.create(this);
-	dlgOilPaint.create(this);
-	dlgOutline.create(this);
-	dlgPencilSketch.create(this);
-	dlgPixelate.create(this);
-	dlgRadialBlur.create(this);
-	dlgRandomJitter.create(this);
-	dlgRipple.create(this);
-	dlgSmartBlur.create(this);
-	dlgSmear.create(this);
-	dlgSoftPortrait.create(this);
-	dlgStamp.create(this);
-	dlgSurfaceBlur.create(this);
-	dlgSwirl.create(this);
-	dlgTileGlass.create(this);
-	dlgWater.create(this);
-	dlgWave.create(this);
-
-	dlgAddNoise.set_document(&doc);
-	dlgBulge.set_document(&doc);
-	dlgCrystalize.set_document(&doc);
-	dlgDespeckle.set_document(&doc);
-	dlgGain.set_document(&doc);
-	dlgGlow.set_document(&doc);
-	dlgGaussianBlur.set_document(&doc);
-	dlgMarble.set_document(&doc);
-	dlgMedian.set_document(&doc);
-	dlgMotionBlur.set_document(&doc);
-	dlgOilPaint.set_document(&doc);
-	dlgOutline.set_document(&doc);
-	dlgPencilSketch.set_document(&doc);
-	dlgPixelate.set_document(&doc);
-	dlgRadialBlur.set_document(&doc);
-	dlgRandomJitter.set_document(&doc);
-	dlgRipple.set_document(&doc);
-	dlgSmartBlur.set_document(&doc);
-	dlgSmear.set_document(&doc);
-	dlgSoftPortrait.set_document(&doc);
-	dlgStamp.set_document(&doc);
-	dlgSurfaceBlur.set_document(&doc);
-	dlgSwirl.set_document(&doc);
-	dlgTileGlass.set_document(&doc);
-	dlgWater.set_document(&doc);
-	dlgWave.set_document(&doc);
-	*/
 
 	dlgProgress.create(300, 20, this);
 	dlgProgress.set_progress(0.);
 
-	dlgEffect = new UIDSurfaceBlur();
+	std::vector<UIDEffect*> dlgs = {
+		&dlgAddNoise, &dlgBulge, &dlgCrystalize,
+		&dlgDespeckle, &dlgGain, &dlgGlow,
+		&dlgGaussianBlur, &dlgMarble, &dlgMedian,
+		&dlgMotionBlur, &dlgOilPaint, &dlgOutline,
+		&dlgPencilSketch, &dlgPixelate, &dlgRadialBlur,
+		&dlgRandomJitter, &dlgRipple, &dlgSmartBlur,
+		&dlgSmear, &dlgSoftPortrait, &dlgStamp, 
+		&dlgSurfaceBlur, &dlgSwirl, &dlgTileGlass, 
+		&dlgWater, &dlgWave, &dlgContBright, 
+		&dlgChannelMixer, &dlgColorBalance, &dlgCurves, 
+		&dlgHSL, &dlgLevels, &dlgPosterize, &dlgThreshold,
+	};
 
+	for (auto& dlg : dlgs) {
+		dlg->config(3, 3);
+		dlg->create(this);
+		dlg->set_document(&document);
+	}
+
+	/*dlgEffect = new UIDSurfaceBlur();
 	dlgEffect->config(3, 3);
 	dlgEffect->create(this);
 	dlgEffect->set_document(&document);
-	show_effect(dlgEffect);
+	show_effect(dlgEffect);*/
 
 	//uix->show_box_model();
 }
@@ -203,10 +147,10 @@ void UIContainer::process_event(OUI* element, uint32_t message, uint64_t param, 
 		save(filePath);
 	}
 	else if (message == UISIDE_CLOSE_DOCUMENT) {
-		dlgEffect->show();
-		//if (document.is_invalidated())
-		//	dlgCloseWithoutSave.show_window();
-		//else close_document(false);// this is guraranteed to close it because it is not invalidated i.e saved
+		//dlgEffect->show();
+		if (document.is_invalidated())
+			dlgCloseWithoutSave.show_window();
+		else close_document(false);// this is guraranteed to close it because it is not invalidated i.e saved
 	}
 	else if (element == &mainView) {
 		auto zInfo = mainView.get_zoom_info();

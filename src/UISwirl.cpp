@@ -1,9 +1,8 @@
-#include "UIBulge.h"
+#include "UISwirl.h"
 #include "ImageEffect.h"
 
-void UIBulge::on_init() {
+void UISwirl::on_init() {
 	img.create(10, 10, 3);
-	imgGrid.create(10, 10, 3);
 	chkStretch.create(this);
 	chkStretch.select(bStretch = true);
 	chkStretch.set_type(UIRadioType::Button);
@@ -16,63 +15,108 @@ void UIBulge::on_init() {
 	chkStretch.canvas.art.alignX = Align::CENTER;
 	chkStretch.canvas.art.alignY = Align::CENTER;
 	chkStretch.padding.set(4);
-	amount = 0;
+	angle = 0;
 }
 
-bool UIBulge::is_stretched() const {
+bool UISwirl::is_stretched() const {
 	return bStretch;
 }
 
-void UIBulge::set_amount(double amount) {
-	this->amount = amount;
+void UISwirl::set_angle(double angle) {
+	this->angle = angle;
 	fill_image();
 }
 
-void UIBulge::on_update() {
+void UISwirl::on_update() {
 	chkStretch.set_color(Color(64, 64, 64));
 	canvas.bit_blt(img, contentArea.left, contentArea.top, contentArea.width, contentArea.height,
 		0, 0, true);
 }
 
-void UIBulge::fill_image() {
-	size_t i, verDivCount, horDivCount;
-	int x, y, w, h;
-	double divW, divH;
-
-	Canvas can(NULL, &imgGrid);
+void UISwirl::fill_image() {
+	Canvas can(NULL, &img);
 	can.clear(NULL, &Color("#fff"));
 
-	w = imgGrid.w;
-	h = imgGrid.h;
-	divW = 10.;
-	divH = 10.;
-	horDivCount = Max(size_t(w / divW), 2);
-	verDivCount = Max(size_t(h / divH), 2);
-	horDivCount = horDivCount / 2 * 2;
-	verDivCount = verDivCount / 2 * 2;
+	pixfmt_bgr pf(&img, 0);
+	agg::path_storage path;
+	agg::conv_stroke<agg::path_storage> stroke(path);
+	stroke.width(1);
+	stroke.line_join(agg::line_join_e::bevel_join);
+	stroke.line_cap(agg::line_cap_e::square_cap);
+	stroke.inner_join(agg::inner_join_e::inner_bevel);
 
-	can.art.strokeColor.set(Color(120, 120, 120));
-	size_t strokeW = 2;
+	Color cr(5, 80, 120);
 
-	for (i = 0; i < verDivCount; ++i) {
-		y = i * (h - 1) / (verDivCount - 1);
-		can.draw_horizontal_line(y, 0, w - 1, strokeW);
+	int p = img.pitch;
+	double u, v, theta, t, r, un_x, un_y, cw, ch;
+	double twist = angle * angle * ((angle > 0) ? 1 : -1);
+	int x2, y2, right, bottom;
+	double size = 0.9;
+
+	int x, y, w, h;
+	w = img.w;
+	h = img.h;
+	cw = w / 2.0;
+	ch = h / 2.0;
+	right = w - 1;
+	bottom = h - 1;
+	double invmaxrad = 1.0 / ch;
+	double sc = (double)w / (double)h;
+	double ss = 1;
+	double iwmax = w - 1;
+	double ihmax = h - 1;
+
+	if (!bStretch)
+		sc = ss = 1;
+	v = 0;
+
+	path.move_to(0, ch);
+	for (x = 0; x < w; x++) {
+		u = (x - cw) / sc;
+
+		r = sqrt(u * u);
+		theta = atan2(0, u);
+
+		t = 1 - ((r * size) * invmaxrad);
+		t = (t < 0) ? 0 : (t * t * t);
+		theta += (t * twist) / 100.0;
+
+		un_x = fmax(fmin(cw + r * cos(theta) * sc, iwmax), 0.);
+		un_y = fmax(fmin(ch + r * sin(theta) * ss, ihmax), 0.);
+
+		x2 = (int)(un_x + 0.5);
+		y2 = (int)(un_y + 0);
+		path.line_to(x2, y2);
 	}
 
-	for (i = 0; i < horDivCount; ++i) {
-		x = i * (w - 1) / (horDivCount - 1);
-		can.draw_vertical_line(x, 0, h - 1, strokeW);
+	path.move_to(cw + 1, 0);
+	for (y = 0; y < h; y++)
+	{
+		v = (y - ch);
+
+		r = sqrt(v * v);
+		theta = atan2(v, 0);
+
+		t = 1 - ((r * size) * invmaxrad);
+		t = (t < 0) ? 0 : (t * t * t);
+		theta += (t * twist) / 100.0;
+
+		un_x = fmax(fmin(cw + r * cos(theta) * sc, iwmax), 0.);
+		un_y = fmax(fmin(ch + r * sin(theta) * ss, ihmax), 0.);
+
+		x2 = (int)(un_x + 0.5);
+		y2 = (int)(un_y + 0);
+		path.line_to(x2, y2);
 	}
 
-	ImageEffect::bulge(&imgGrid, &img, amount , bStretch, .5, .5,
-		0, 0, img.w, img.h);
+	can.add_path<agg::conv_stroke<agg::path_storage>>(stroke);
+	can.render(cr);
 
 	invalidate();
 }
 
-void UIBulge::on_resize(int width, int height) {
+void UISwirl::on_resize(int width, int height) {
 	img.resize(contentArea.width, contentArea.height);
-	imgGrid.resize(contentArea.width, contentArea.height);
 	fill_image();
 
 	int margin = 10;
@@ -80,7 +124,7 @@ void UIBulge::on_resize(int width, int height) {
 	chkStretch.move(contentArea.width - btnW - margin, margin, btnW, btnH);
 }
 
-void UIBulge::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
+void UISwirl::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &chkStretch) {
 		if (message == Event::Select || message == Event::Deselect) {
 			chkStretch.select(message == Event::Select);

@@ -36,7 +36,7 @@ void UIMHistory::update_history_list() {
 		auto btn = new UIButtonWithThumbnail();
 		if (bFirst) {
 			bFirst = false;
-			btn->create(0, 0, w, h * 1.5, &list);
+			btn->create(0, 0, w, int(h * 1.5), &list);
 			padding.left = 5;
 		}
 		else {

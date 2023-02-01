@@ -185,10 +185,10 @@ void UIDLevels::process_event(OUI* element, uint32_t message, uint64_t param, bo
 		}
 
 		selPreset.select_option(9);
-		currentChannelInfo->minRange = slRange.get_value(0);
-		currentChannelInfo->maxRange = slRange.get_value(2);
-		currentChannelInfo->outputMin = slOutput.get_value(0);
-		currentChannelInfo->outputMax = slOutput.get_value(1);
+		currentChannelInfo->minRange = CLAMP255(slRange.get_value(0));
+		currentChannelInfo->maxRange = CLAMP255(slRange.get_value(2));
+		currentChannelInfo->outputMin = CLAMP255(slOutput.get_value(0));
+		currentChannelInfo->outputMax = CLAMP255(slOutput.get_value(1));
 		if (currentChannelInfo != &rgbInfo) currentChannelInfo->fill_lookup(&rgbInfo);
 
 		shouldInvalidate = true;

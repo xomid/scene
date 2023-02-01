@@ -28,7 +28,7 @@ void UIDPixelate::on_resize(int width, int height) {
 
 void UIDPixelate::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &cCellSize) {
-		cellSize = cCellSize.get_value();
+		cellSize = (size_t)cCellSize.get_value();
 		shouldInvalidate = true;
 	}
 	else {

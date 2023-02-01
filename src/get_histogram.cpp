@@ -26,7 +26,7 @@ int ImageEffect::get_histo(Sheet* srcImage, HistogramBlob* blob)
 	for (y = 0; y < h; y++) {
 		d = data + y * p;
 		for (x = 0; x < w; x++) {
-			gray = d[0] * 0.114 + d[1] * 0.587 + d[2] * 0.299;
+			gray = CLAMP255(int((double)d[0] * 0.114 + (double)d[1] * 0.587 + (double)d[2] * 0.299));
 			blob->grayHisto[gray]++;
 			blob->bHisto[*d++]++;
 			blob->gHisto[*d++]++;
@@ -47,10 +47,10 @@ int ImageEffect::get_histo(Sheet* srcImage, HistogramBlob* blob)
 	}
 
 	for (x = 0; x < 256; x++) {
-		blob->grayHisto[x] = ((double)blob->grayHisto[x] * 255 / blob->bMax);
-		blob->bHisto[x] = ((double)blob->bHisto[x] * 255 / blob->bMax);
-		blob->gHisto[x] = ((double)blob->gHisto[x] * 255 / blob->gMax);
-		blob->rHisto[x] = ((double)blob->rHisto[x] * 255 / blob->rMax);
+		blob->grayHisto[x] = blob->grayHisto[x] * 255 / blob->bMax;
+		blob->bHisto[x] = blob->bHisto[x] * 255 / blob->bMax;
+		blob->gHisto[x] = blob->gHisto[x] * 255 / blob->gMax;
+		blob->rHisto[x] = blob->rHisto[x] * 255 / blob->rMax;
 	}
 
 	return IMAGE_EFFECT_RESULT_OK;
