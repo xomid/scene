@@ -47,10 +47,10 @@ int ImageEffect::get_histo(Sheet* srcImage, HistogramBlob* blob)
 	}
 
 	for (x = 0; x < 256; x++) {
-		blob->grayHisto[x] = blob->grayHisto[x] * 255 / blob->bMax;
-		blob->bHisto[x] = blob->bHisto[x] * 255 / blob->bMax;
-		blob->gHisto[x] = blob->gHisto[x] * 255 / blob->gMax;
-		blob->rHisto[x] = blob->rHisto[x] * 255 / blob->rMax;
+		blob->grayHisto[x] = blob->bMax ? blob->grayHisto[x] * 255 / blob->bMax : 0;
+		blob->bHisto[x] = blob->bMax ? blob->bHisto[x] * 255 / blob->bMax : 0;
+		blob->gHisto[x] = blob->gMax ? blob->gHisto[x] * 255 / blob->gMax : 0;
+		blob->rHisto[x] = blob->rMax ? blob->rHisto[x] * 255 / blob->rMax : 0;
 	}
 
 	return IMAGE_EFFECT_RESULT_OK;

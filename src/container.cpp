@@ -11,31 +11,64 @@ void UIContainer::create_effect_windows() {
 	dlgProgress.create(300, 20, this);
 	dlgProgress.set_progress(0.);
 
-	std::vector<UIDEffect*> dlgs = {
-		&dlgAddNoise, &dlgBulge, &dlgCrystalize,
-		&dlgDespeckle, &dlgGain, &dlgGlow,
-		&dlgGaussianBlur, &dlgMarble, &dlgMedian,
-		&dlgMotionBlur, &dlgOilPaint, &dlgOutline,
-		&dlgPencilSketch, &dlgPixelate, &dlgRadialBlur,
-		&dlgRandomJitter, &dlgRipple, &dlgSmartBlur,
-		&dlgSmear, &dlgSoftPortrait, &dlgStamp, 
-		&dlgSurfaceBlur, &dlgSwirl, &dlgTileGlass, 
-		&dlgWater, &dlgWave, &dlgContBright, 
-		&dlgChannelMixer, &dlgColorBalance, &dlgCurves, 
-		&dlgHSL, &dlgLevels, &dlgPosterize, &dlgThreshold,
+	dlgAdjusts = {
+		&dlgAutoContrast,
+		&dlgContBright, 
+		&dlgChannelMixer, 
+		&dlgColorBalance, 
+		&dlgCurves, 
+		&dlgDesaturate,
+		&dlgHSL, 
+		&dlgLevels, 
+		&dlgNegative,
+		&dlgPosterize,
+		&dlgThreshold
 	};
+
+	dlgFilters = {
+		&dlgAddNoise, 
+		&dlgBlur,
+		&dlgBulge, 
+		&dlgBump,
+		&dlgCrystalize,
+		&dlgDespeckle, 
+		&dlgGaussianBlur, 
+		&dlgGain,
+		&dlgGlow,
+		&dlgMarble, 
+		&dlgMaximum,
+		&dlgMedian,
+		&dlgMinimum,
+		&dlgMotionBlur, 
+		&dlgOilPaint, 
+		&dlgOutline,
+		&dlgPencilSketch,
+		&dlgPixelate, 
+		&dlgRadialBlur,
+		&dlgRandomJitter, 
+		&dlgReduceNoise,
+		&dlgRipple, 
+		&dlgSharpen,
+		&dlgSmartBlur,
+		&dlgSmear, 
+		&dlgSoftPortrait, 
+		&dlgStamp,
+		&dlgSurfaceBlur, 
+		&dlgSwirl,
+		&dlgTileGlass,
+		&dlgUnsharp,
+		&dlgWater, 
+		&dlgWave,
+	};
+
+	std::vector<UIDEffect*> dlgs = dlgAdjusts;
+	dlgs.insert(dlgs.end(), dlgFilters.begin(), dlgFilters.end());
 
 	for (auto& dlg : dlgs) {
 		dlg->config(3, 3);
 		dlg->create(this);
 		dlg->set_document(&document);
 	}
-
-	/*dlgEffect = new UIDSurfaceBlur();
-	dlgEffect->config(3, 3);
-	dlgEffect->create(this);
-	dlgEffect->set_document(&document);
-	show_effect(dlgEffect);*/
 
 	//uix->show_box_model();
 }
@@ -147,10 +180,23 @@ void UIContainer::process_event(OUI* element, uint32_t message, uint64_t param, 
 		save(filePath);
 	}
 	else if (message == UISIDE_CLOSE_DOCUMENT) {
-		//dlgEffect->show();
 		if (document.is_invalidated())
 			dlgCloseWithoutSave.show_window();
 		else close_document(false);// this is guraranteed to close it because it is not invalidated i.e saved
+	}
+	else if (message == UISIDE_SELECT_ADJUSTMENT) {
+		auto effectId = param;
+		if (effectId >= 0 && effectId < dlgAdjusts.size()) {
+			currEffectDlg = dlgAdjusts[effectId];
+			currEffectDlg->show(true);
+		}
+	}
+	else if (message == UISIDE_SELECT_FILTER) {
+		auto effectId = param;
+		if (effectId >= 0 && effectId < dlgFilters.size()) {
+			currEffectDlg = dlgFilters[effectId];
+			currEffectDlg->show(true);
+		}
 	}
 	else if (element == &mainView) {
 		auto zInfo = mainView.get_zoom_info();
@@ -191,6 +237,9 @@ void UIContainer::process_event(OUI* element, uint32_t message, uint64_t param, 
 
 			invalidate();
 		}
+	}
+	else {
+		OUI::process_event(element, message, param, bubbleUp);
 	}
 }
 
@@ -273,7 +322,7 @@ void UIContainer::on_timer(uint32_t nTimer) {
 		kill_timer(1);
 		if (shouldCopyResult) {
 			dlgProgress.show_window(false);
-			copy_result(); 
+			copy_result();
 		}
 		else {
 			document.reset_frame();

@@ -42,6 +42,16 @@
 #include "UIDTileGlass.h"
 #include "UIDWater.h"
 #include "UIDWave.h"
+#include "UIDAutoContrast.h"
+#include "UIDDesaturate.h"
+#include "UIDNegative.h"
+#include "UIDBlur.h"
+#include "UIDBump.h"
+#include "UIDMaximum.h"
+#include "UIDMinimum.h"
+#include "UIDReduceNoise.h"
+#include "UIDSharpen.h"
+#include "UIDUnsharp.h"
 
 
 class UIContainer : public OUI
@@ -87,8 +97,19 @@ class UIContainer : public OUI
 	UIDLevels dlgLevels;
 	UIDPosterize dlgPosterize;
 	UIDThreshold dlgThreshold;
+	UIDAutoContrast dlgAutoContrast;
+	UIDDesaturate dlgDesaturate;
+	UIDNegative dlgNegative;
+	UIDBlur dlgBlur;
+	UIDBump dlgBump;
+	UIDMaximum dlgMaximum;
+	UIDMinimum dlgMinimum;
+	UIDReduceNoise dlgReduceNoise;
+	UIDSharpen dlgSharpen;
+	UIDUnsharp dlgUnsharp;
 
 	UIDEffect* currEffectDlg;
+	std::vector<UIDEffect*> dlgAdjusts, dlgFilters;
 	std::vector<FileDialogFileType> fileTypes;
 	Sheet tempImage;
 	bool shouldCopyResult, isRenderingDone;

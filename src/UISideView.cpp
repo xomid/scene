@@ -197,17 +197,29 @@ void UISideView::process_event(OUI* element, uint32_t message, uint64_t param, b
 		parent->process_event(this, UIZOOM_UPDATE, param, true);
 	}
 	else if (message == Event::Click) {
-		if (element == &btnUndo) {
-			parent->process_event(this, UIHISTO_UPDATE, 1, true);
-		}
-		else if (element == &btnRedo) {
-			parent->process_event(this, UIHISTO_UPDATE, 2, true);
-		}
-		else if (element == &btnClose) {
-			parent->process_event(this, UISIDE_CLOSE_DOCUMENT, 0, true);
-		}
-		else if (element == &btnInfo) {
+		if (element) {
+			if (element == &btnUndo) {
+				parent->process_event(this, UIHISTO_UPDATE, 1, true);
+			}
+			else if (element == &btnRedo) {
+				parent->process_event(this, UIHISTO_UPDATE, 2, true);
+			}
+			else if (element == &btnClose) {
+				parent->process_event(this, UISIDE_CLOSE_DOCUMENT, 0, true);
+			}
+			else if (element->parent == mAdj->get_list()) {
+				auto effectId = ((UIButtonWithThumbnail*)element)->get_id();
+				mAdj->show_window(false);
+				parent->process_event(this, UISIDE_SELECT_ADJUSTMENT, effectId, true);
+			}
+			else if (element->parent == mFilter->get_list()) {
+				auto effectId = ((UIButtonWithThumbnail*)element)->get_id();
+				mFilter->show_window(false);
+				parent->process_event(this, UISIDE_SELECT_FILTER, effectId, true);
+			}
+			else if (element == &btnInfo) {
 
+			}
 		}
 	} else if (message == Event::Update) {
 		

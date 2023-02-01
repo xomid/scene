@@ -11,6 +11,10 @@ void UIButtonWithThumbnail::set_thumbnail(byte* thumbData, int width, int height
 	transform(big = true);
 }
 
+void UIButtonWithThumbnail::on_mouse_up(int x, int y, uint32_t param) {
+	UIButton::on_mouse_up(x, y, param);
+}
+
 void UIButtonWithThumbnail::on_update() {
 	UIButton::on_update();
 	bit_blt(&area, canvas.sheet, rcThumb.left, rcThumb.top, rcThumb.width, rcThumb.height,
@@ -69,4 +73,12 @@ void UIButtonWithThumbnail::transform(bool big) {
 void UIButtonWithThumbnail::set_thumb_padding(Spacing thumbPadding) {
 	this->thumbPadding = thumbPadding;
 	transform(big);
+}
+
+void UIButtonWithThumbnail::set_id(int id) {
+	this->id = id;
+}
+
+int UIButtonWithThumbnail::get_id() const {
+	return id;
 }

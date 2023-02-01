@@ -40,3 +40,7 @@ void UIComMenu::on_resize(int width, int height) {
 
 void UIComMenu::enable_element(uint32_t index, bool enable) {
 }
+
+UIStack* UIComMenu::get_list() {
+	return &list;
+}

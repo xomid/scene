@@ -56,6 +56,7 @@ void UIMFilter::on_init() {
 
 	Spacing thumbPadding;
 	thumbPadding.set(4);
+	int id = 0;
 
 	for (auto& itemInfo : itemInfos) {
 		auto item = new UIButtonWithThumbnail();
@@ -65,5 +66,6 @@ void UIMFilter::on_init() {
 		item->set_thumbnail(itemInfo.thumbnailData, SMA_WIDTH, SMA_HEIGHT, SMA_WIDTH * 3, 3);
 		item->transform(big);
 		item->set_thumb_padding(thumbPadding);
+		item->set_id(id++);
 	}
 }

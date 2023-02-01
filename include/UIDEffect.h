@@ -23,10 +23,9 @@ protected:
 	// this is a dummy function and is used so that compiler 
 	// doesnt optimize away an empty useless while loop
 	void wait_for_painting();
-
-	void render_thread();
 	void stop_render_thread();
 public:
+	void render_thread();
 	void on_resize(int width, int height) override;
 	void process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) override;
 	void cancel();

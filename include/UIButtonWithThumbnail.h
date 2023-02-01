@@ -7,6 +7,7 @@ class UIButtonWithThumbnail : public UIButton
 	Rect rcThumb;
 	Spacing thumbPadding;
 	bool big;
+	int id;
 
 public:
 	~UIButtonWithThumbnail();
@@ -15,6 +16,9 @@ public:
 	void on_init() override;
 	void transform(bool big);
 	bool on_mouse_wheel(int x, int y, int zDelta, uint32_t param) override;
+	void on_mouse_up(int x, int y, uint32_t param) override;
 	void set_thumb_padding(Spacing thumbPadding);
+	void set_id(int id);
+	int get_id() const;
 };
 

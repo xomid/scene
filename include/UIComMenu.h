@@ -13,6 +13,7 @@ protected:
 	UIStack list;
 	UILabel lblTitle;
 public:
+	UIStack* get_list();
 	void set_title(std::wstring title);
 	void on_init() override;
 	void on_resize(int width, int height) override;

@@ -11,6 +11,8 @@
 #include "Document.h"
 
 #define UISIDE_CLOSE_DOCUMENT (Event::_last + 3)
+#define UISIDE_SELECT_ADJUSTMENT (UISIDE_CLOSE_DOCUMENT + 1)
+#define UISIDE_SELECT_FILTER (UISIDE_SELECT_ADJUSTMENT + 1)
 
 class UISideView : public UIStack
 {
