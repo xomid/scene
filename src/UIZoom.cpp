@@ -112,7 +112,7 @@ void UIZoom::on_mouse_move(int x, int y, uint32_t flags) {
 	Sheet* srcImage = get_image();
 	if (srcImage == NULL) return;
 
-	if (bPressed) {
+	if (isPressed) {
 		double fx = (x - rcImage.left) / double(rcImage.width);
 		double fy = (y - rcImage.top) / double(rcImage.height);
 		dragMgr.drag(fx, fy, zInfo.l, zInfo.t);

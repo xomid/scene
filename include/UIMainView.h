@@ -14,7 +14,7 @@ class UIMainView : public OUI
 	Document* document;
 	Sheet* image;
 	ImageProperties imgProps;
-	bool bPressed, bShowDoc;
+	bool bShowDoc;
 	Drag<int, int> dragMgr;
 	Rect unmodifiedContentArea;
 	int clientWidth, clientHeight, scrollSize,

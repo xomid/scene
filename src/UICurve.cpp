@@ -250,7 +250,7 @@ void UICurve::on_mouse_down(int x, int y, uint32_t flags) {
 			process_event(this, Event::Update, 1, true);
 
 		set_capture(this);
-		bPressed = true;
+		isPressed = true;
 
 		bMoving = 0;
 		lastPressedX = x;
@@ -290,7 +290,7 @@ void UICurve::on_mouse_down(int x, int y, uint32_t flags) {
 }
 
 void UICurve::on_mouse_move(int x, int y, uint32_t flags) {
-	if (bPressed)
+	if (isPressed)
 	{
 		if (iHover > -1 && iHover < curve->nCount)
 		{
@@ -456,7 +456,7 @@ void UICurve::on_mouse_move(int x, int y, uint32_t flags) {
 void UICurve::on_mouse_up(int x, int y, uint32_t flags) {
 	if (get_capture() == this)
 		release_capture();
-	bPressed = bSuspend = false;
+	isPressed = bSuspend = false;
 	iHover = -2;
 	bMoving = 0;
 	//wndInfo->ShowWindow(SW_HIDE);

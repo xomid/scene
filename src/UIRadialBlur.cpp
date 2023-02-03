@@ -157,7 +157,7 @@ void UIRadialBlur::on_resize(int width, int height) {
 }
 
 void UIRadialBlur::on_mouse_move(int x, int y, uint32_t flags) {
-	if (bPressed) {
+	if (isPressed) {
 		cx = x / double(contentArea.width);
 		cy = y / double(contentArea.height);
 		calc_offset();
@@ -167,13 +167,13 @@ void UIRadialBlur::on_mouse_move(int x, int y, uint32_t flags) {
 }
 
 void UIRadialBlur::on_mouse_down(int x, int y, uint32_t flags) {
-	bPressed = true;
+	isPressed = true;
 	set_capture(this);
 	on_mouse_move(x, y, flags);
 }
 
 void UIRadialBlur::on_mouse_up(int x, int y, uint32_t flags) {
-	bPressed = false;
+	isPressed = false;
 	if (get_capture() == this)
 		release_capture();
 }

@@ -6,7 +6,7 @@ void UIButtonWithBorderOnHover::on_init() {
 
 void UIButtonWithBorderOnHover::enable(bool enable) {
 	UIButton::enable(enable);
-	if (bHover && bEnabled) {
+	if (isHover && bEnabled) {
 		border.set(1, hoverBorderColor);
 	}
 	else {
@@ -14,9 +14,9 @@ void UIButtonWithBorderOnHover::enable(bool enable) {
 	}
 }
 
-void UIButtonWithBorderOnHover::hover(bool bHover) {
-	UIButton::hover(bHover);
-	if (bHover && bEnabled) {
+void UIButtonWithBorderOnHover::hover(bool isHover) {
+	UIButton::hover(isHover);
+	if (isHover && bEnabled) {
 		border.set(1, hoverBorderColor);
 	}
 	else {
@@ -50,9 +50,9 @@ void UIButtonWithBorderOnHover::on_update() {
 		colors["currentColor"] = color;
 	}
 
-	if (!bPressed && !bHover) return UILabel::on_update();
+	if (!isPressed && !isHover) return UILabel::on_update();
 	backgroundColor.save();
-	backgroundColor.set(bPressed && bHover ? downBackColor : bHover && !bPressed ? hoverBackColor : backgroundColor);
+	backgroundColor.set(isPressed && isHover ? downBackColor : isHover && !isPressed ? hoverBackColor : backgroundColor);
 	UILabel::on_update();
 	backgroundColor.restore();
 }

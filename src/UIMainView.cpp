@@ -46,7 +46,7 @@ static double ZoomLevel[29] =
 };
 
 UIMainView::UIMainView()
-	: bPressed(false), clientWidth(0), clientHeight(0), scrollSize(10),
+	: clientWidth(0), clientHeight(0), scrollSize(10),
 	visibleLeft(0), visibleTop(0), visibleRight(0), visibleBottom(0), document(0), image(0)
 {
 	bScrollable = true;

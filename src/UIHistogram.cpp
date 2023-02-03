@@ -32,7 +32,7 @@ void UIHistogram::fill_image() {
 		lookupValue = histogramBlob.grayHisto[lookupIndex];
 		yLevel = h - (lookupValue * h / 256);
 
-		if (bPressed && x >= invertMin && x <= invertMax) {
+		if (isPressed && x >= invertMin && x <= invertMax) {
 			fillR = backgroundColor.r;
 			fillG = backgroundColor.g;
 			fillB = backgroundColor.b;
@@ -86,7 +86,7 @@ void UIHistogram::on_update() {
 }
 
 void UIHistogram::on_mouse_move(int x, int y, uint32_t flags) {
-	if (bPressed) {
+	if (isPressed) {
 		invertEnd = x - contentArea.left;
 		fill_image();
 		invalidate();
@@ -94,13 +94,13 @@ void UIHistogram::on_mouse_move(int x, int y, uint32_t flags) {
 }
 
 void UIHistogram::on_mouse_down(int x, int y, uint32_t flags) {
-	bPressed = true;
+	isPressed = true;
 	invertStart = x - contentArea.left;
 	invalidate();
 }
 
 void UIHistogram::on_mouse_up(int x, int y, uint32_t flags) {
-	bPressed = false;
+	isPressed = false;
 	fill_image();
 	invalidate();
 }
