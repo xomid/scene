@@ -115,7 +115,7 @@ void UIContainer::on_init()
 	sideView.set_document(&document);
 	sideView.config_elements_based_on_document_status();
 
-	load(L"C:\\Users\\Omid\\Pictures\\6.jpg");
+	load(L"C:\\lena.jpg");
 
 	create_effect_windows();
 	uix->apply_theme_all();
