@@ -232,7 +232,7 @@ void UIDChannelMixer::process_event(OUI* element, uint32_t message, uint64_t par
 			if (element == &chkMono) {
 				auto prevState = isMonochromatic;
 				chkMono.select(message == Event::Select);
-				isMonochromatic = chkMono.bSelected;
+				isMonochromatic = chkMono.isSelected;
 				shouldInvalidate = isMonochromatic != prevState;
 				if (shouldInvalidate)
 					reset_output_channel_menu();
@@ -241,7 +241,7 @@ void UIDChannelMixer::process_event(OUI* element, uint32_t message, uint64_t par
 			else if (element == &chkPreserveLum) {
 				auto prevState = shouldPreserveLum;
 				chkPreserveLum.select(message == Event::Select);
-				shouldPreserveLum = chkPreserveLum.bSelected;
+				shouldPreserveLum = chkPreserveLum.isSelected;
 				shouldInvalidate = shouldPreserveLum != prevState;
 			}
 		}

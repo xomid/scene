@@ -57,7 +57,7 @@ void UIDThreshold::process_event(OUI* element, uint32_t message, uint64_t param,
 		if (message == Event::Select || message == Event::Deselect) {
 			auto prevState = bMono;
 			chkMono.select(message == Event::Select);
-			bMono = chkMono.bSelected;
+			bMono = chkMono.isSelected;
 			shouldInvalidate = bMono != prevState;
 		}
 	}

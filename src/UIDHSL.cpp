@@ -118,7 +118,7 @@ void UIDHSL::process_event(OUI* element, uint32_t message, uint64_t param, bool 
 			if (message == Event::Select || message == Event::Deselect) {
 				auto prevState = shouldColorize;
 				chkColorize.select(message == Event::Select);
-				shouldColorize = chkColorize.bSelected;
+				shouldColorize = chkColorize.isSelected;
 				colorize();
 				shouldInvalidate = shouldColorize != prevState;
 			}

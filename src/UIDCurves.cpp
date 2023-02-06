@@ -156,10 +156,10 @@ void UIDCurves::process_event(OUI* element, uint32_t message, uint64_t param, bo
 	}
 	else if (element == &rdCurve || element == &rdPoint) {
 		if (message == Event::Select) {
-			auto prevState = rdCurve.bSelected;
+			auto prevState = rdCurve.isSelected;
 			element->select(true);
-			bCurve = rdCurve.bSelected;
-			cCurve.set_type(rdCurve.bSelected ? CurveType::Spline : CurveType::Point);
+			bCurve = rdCurve.isSelected;
+			cCurve.set_type(rdCurve.isSelected ? CurveType::Spline : CurveType::Point);
 			shouldInvalidate = bCurve != prevState;
 		}
 	}

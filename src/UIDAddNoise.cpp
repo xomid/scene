@@ -57,14 +57,14 @@ void UIDAddNoise::process_event(OUI* element, uint32_t message, uint64_t param, 
 	else if (element == &rdGussian || element == &rdUniform) {
 		if (message == Event::Select) {
 			element->select(true);
-			if (rdGussian.bSelected) noiseType = NoiseType::Gussian;
+			if (rdGussian.isSelected) noiseType = NoiseType::Gussian;
 			else noiseType = NoiseType::Gussian;
 			shouldInvalidate = true;
 		}
 	}
 	else if (element == &chkMono) {
 		chkMono.select(message == Event::Select);
-		bMono = chkMono.bSelected;
+		bMono = chkMono.isSelected;
 		shouldInvalidate = true;
 	}
 	else {

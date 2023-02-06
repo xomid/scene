@@ -79,7 +79,7 @@ void UIDColorBalance::process_event(OUI* element, uint32_t message, uint64_t par
 		if (message == Event::Select || message == Event::Deselect) {
 			auto prevState = bPreserveLum;
 			chkPreserveLum.select(message == Event::Select);
-			bPreserveLum = chkPreserveLum.bSelected;
+			bPreserveLum = chkPreserveLum.isSelected;
 			shouldInvalidate = bPreserveLum != prevState;
 		}
 	}

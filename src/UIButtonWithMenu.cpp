@@ -40,9 +40,9 @@ void UIButtonWithMenu::set_menu(UIMenu* menu) {
 }
 
 void UIButtonWithMenu::on_mouse_down(int x, int y, uint32_t flags) {
-	if (!bEnabled) return;
+	if (!isEnabled) return;
 
-	bOn = menu->bVisible;
+	bOn = menu->isVisible;
 	UIButton::on_mouse_down(x, y, flags);
 	if (bOn) {
 		bOn = false;

@@ -47,7 +47,7 @@ void UIDContBright::on_resize(int width, int height) {
 }
 
 void UIDContBright::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
-	if (element == &scBright) {
+	if (element == &scBright && message == Event::Update) {
 		brightness = (int)scBright.get_value();
 		shouldInvalidate = true;
 	}
@@ -59,7 +59,7 @@ void UIDContBright::process_event(OUI* element, uint32_t message, uint64_t param
 		if (message == Event::Select || message == Event::Deselect) {
 			auto prevState = bLegacy;
 			chkLegacy.select(message == Event::Select);
-			bLegacy = chkLegacy.bSelected;
+			bLegacy = chkLegacy.isSelected;
 			if (bLegacy) {
 				scBright.config(scBright.get_value(), 1, -100, 100, 60);
 				scContst.config(scContst.get_value(), 1, -100, 100, 60);

@@ -115,7 +115,7 @@ void UIDCrystalize::process_event(OUI* element, uint32_t message, uint64_t param
 	else if (element == &chkFadeEdges) {
 		if (message == Event::Select || message == Event::Deselect) {
 			chkFadeEdges.select(message == Event::Select);
-			shouldFadeEdges = chkFadeEdges.bSelected;
+			shouldFadeEdges = chkFadeEdges.isSelected;
 			shouldInvalidate = true;
 		}
 	}

@@ -6,7 +6,7 @@ void UIButtonWithBorderOnHover::on_init() {
 
 void UIButtonWithBorderOnHover::enable(bool enable) {
 	UIButton::enable(enable);
-	if (isHover && bEnabled) {
+	if (isHover && isEnabled) {
 		border.set(1, hoverBorderColor);
 	}
 	else {
@@ -16,7 +16,7 @@ void UIButtonWithBorderOnHover::enable(bool enable) {
 
 void UIButtonWithBorderOnHover::hover(bool isHover) {
 	UIButton::hover(isHover);
-	if (isHover && bEnabled) {
+	if (isHover && isEnabled) {
 		border.set(1, hoverBorderColor);
 	}
 	else {
@@ -35,7 +35,7 @@ void UIButtonWithBorderOnHover::apply_theme(bool bInvalidate) {
 }
 
 void UIButtonWithBorderOnHover::on_update() {
-	if (!bEnabled) {
+	if (!isEnabled) {
 		color.save();
 		Color alteredColor = color.bright(50);
 		colors["currentColor"] = alteredColor;

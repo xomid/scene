@@ -42,9 +42,9 @@ void UIDEffect::on_resize(int width, int height) {
 void UIDEffect::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 	if (element == &chkPreview && (message == Event::Select || message == Event::Deselect)) {
 		chkPreview.select(message == Event::Select);
-		shouldPreview = chkPreview.bSelected;
+		shouldPreview = chkPreview.isSelected;
 		shouldInvalidate = shouldPreview;
-		parent->process_event(this, Event::Click, shouldPreview, true);
+		parent->process_event(this, UIDEFFECT_PREVIEW, shouldPreview, true);
 	}
 	UIDialog::process_event(element, message, param, bubbleUp);
 }

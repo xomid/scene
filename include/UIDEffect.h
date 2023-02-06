@@ -7,6 +7,7 @@
 #include <chrono>
 
 #define UIDEFFECT_UPDATE (Event::_last + 9)
+#define UIDEFFECT_PREVIEW (UIDEFFECT_UPDATE + 1)
 
 class UIDEffect : public UIDialog
 {

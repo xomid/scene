@@ -55,7 +55,7 @@ void UIDRipple::process_event(OUI* element, uint32_t message, uint64_t param, bo
 		if (message == Event::Select)
 			element->select(true);
 
-		if (rdSinuous.bSelected)
+		if (rdSinuous.isSelected)
 			rippleMode = RippleMode::Sinuous;
 		else
 			rippleMode = RippleMode::Triangle;

@@ -128,7 +128,7 @@ void UISwirl::process_event(OUI* element, uint32_t message, uint64_t param, bool
 	if (element == &chkStretch) {
 		if (message == Event::Select || message == Event::Deselect) {
 			chkStretch.select(message == Event::Select);
-			bStretch = chkStretch.bSelected;
+			bStretch = chkStretch.isSelected;
 			fill_image();
 		}
 	}

@@ -4,8 +4,6 @@
 #include "UIDOpenFile.h"
 #include "UIDSaveFile.h"
 
-UIDEffect* dlgEffect;
-
 void UIContainer::create_effect_windows() {
 
 	dlgProgress.create(300, 20, this);
@@ -125,10 +123,9 @@ void UIContainer::on_init()
 
 void UIContainer::process_event(OUI* element, uint32_t message, uint64_t param, bool bubbleUp) {
 
-	if (element == dlgEffect) {
-		if (message == Event::Click) {
-			mainView.show_frame(param);
-		}
+	// to toggle preview mode
+	if (message == UIDEFFECT_PREVIEW) {
+		mainView.show_frame(param);
 		mainView.invalidate();
 	}
 	else if (message == UIDEFFECT_UPDATE) {
@@ -270,7 +267,7 @@ void UIContainer::load(std::wstring filePath) {
 }
 
 void UIContainer::update_image_dependant_elements() {
-	if (dlgEffect) dlgEffect->reset_image();
+	if (currEffectDlg) currEffectDlg->reset_image();
 }
 
 void UIContainer::save(std::wstring filePath) {

@@ -49,8 +49,8 @@ UIMainView::UIMainView()
 	: clientWidth(0), clientHeight(0), scrollSize(10),
 	visibleLeft(0), visibleTop(0), visibleRight(0), visibleBottom(0), document(0), image(0)
 {
-	bScrollable = true;
-	bShowDoc = false;
+	isScrollable = true;
+	shouldShowDoc = false;
 }
 
 void UIMainView::set_document(Document* document) {
@@ -71,7 +71,7 @@ void UIMainView::reset_view() {
 }
 
 void UIMainView::show_image(bool show) {
-	bShowDoc = show;
+	shouldShowDoc = show;
 	if (show && document) image = document->get_frame();
 	else image = 0;
 	zoom(imgProps.scale);
@@ -99,8 +99,8 @@ void UIMainView::on_update() {
 
 void UIMainView::get_content_area(Rect& rc) {
 	OUI::get_content_area(rc);
-	if (scrollX && scrollX->bVisible) rc.height -= scrollX->boxModel.height;
-	if (scrollY && scrollY->bVisible) rc.width -= scrollY->boxModel.width;
+	if (scrollX && scrollX->isVisible) rc.height -= scrollX->boxModel.height;
+	if (scrollY && scrollY->isVisible) rc.width -= scrollY->boxModel.width;
 }
 
 void UIMainView::on_resize(int width, int height) {

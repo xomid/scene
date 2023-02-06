@@ -65,7 +65,7 @@ void UIDRadialBlur::process_event(OUI* element, uint32_t message, uint64_t param
 		if (message == Event::Select) {
 			element->select(true);
 			blurMode = RadialBlurMode::Spin;
-			if (rdZoom.bSelected)
+			if (rdZoom.isSelected)
 				blurMode = RadialBlurMode::Zoom;
 			cBlur.set_blur_mode(blurMode);
 			shouldInvalidate = true;
